@@ -1,16 +1,17 @@
+import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import AppointmentCard from "@/components/dashboard/AppointmentCard";
+import BookingModal from "@/components/patient/BookingModal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   LayoutDashboard,
   Calendar,
   FileText,
-  MessageSquare,
   Pill,
   Settings,
   CalendarPlus,
-  Bot,
+  HeartPulse,
 } from "lucide-react";
 
 const navItems = [
@@ -18,12 +19,13 @@ const navItems = [
   { name: "Appointments", href: "/patient/appointments", icon: Calendar },
   { name: "Medical Records", href: "/patient/records", icon: FileText },
   { name: "Prescriptions", href: "/patient/prescriptions", icon: Pill },
-  { name: "Chatbot", href: "/patient/chatbot", icon: Bot },
-  { name: "Messages", href: "/patient/messages", icon: MessageSquare },
+  { name: "Health Assistant", href: "/patient/chatbot", icon: HeartPulse },
   { name: "Settings", href: "/patient/settings", icon: Settings },
 ];
 
 const PatientAppointments = () => {
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
+
   const upcomingAppointments = [
     {
       doctorName: "Sarah Johnson",
@@ -109,7 +111,7 @@ const PatientAppointments = () => {
               View and manage your appointments
             </p>
           </div>
-          <Button variant="hero">
+          <Button variant="hero" onClick={() => setBookingModalOpen(true)}>
             <CalendarPlus className="w-5 h-5" />
             Book New Appointment
           </Button>
@@ -144,7 +146,7 @@ const PatientAppointments = () => {
                   <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="font-semibold text-foreground mb-2">No upcoming appointments</h3>
                   <p className="text-muted-foreground mb-4">Book an appointment to get started</p>
-                  <Button variant="hero">
+                  <Button variant="hero" onClick={() => setBookingModalOpen(true)}>
                     <CalendarPlus className="w-5 h-5" />
                     Book Appointment
                   </Button>
@@ -187,6 +189,9 @@ const PatientAppointments = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Booking Modal */}
+      <BookingModal open={bookingModalOpen} onOpenChange={setBookingModalOpen} />
     </DashboardLayout>
   );
 };

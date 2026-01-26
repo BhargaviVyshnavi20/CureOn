@@ -3,11 +3,11 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   LayoutDashboard,
   Calendar,
   FileText,
-  MessageSquare,
   Pill,
   Settings,
   Upload,
@@ -15,7 +15,9 @@ import {
   Image,
   Trash2,
   Download,
-  Bot,
+  HeartPulse,
+  Stethoscope,
+  User,
 } from "lucide-react";
 
 const navItems = [
@@ -23,8 +25,7 @@ const navItems = [
   { name: "Appointments", href: "/patient/appointments", icon: Calendar },
   { name: "Medical Records", href: "/patient/records", icon: FileText },
   { name: "Prescriptions", href: "/patient/prescriptions", icon: Pill },
-  { name: "Chatbot", href: "/patient/chatbot", icon: Bot },
-  { name: "Messages", href: "/patient/messages", icon: MessageSquare },
+  { name: "Health Assistant", href: "/patient/chatbot", icon: HeartPulse },
   { name: "Settings", href: "/patient/settings", icon: Settings },
 ];
 
@@ -35,43 +36,74 @@ interface MedicalRecord {
   date: string;
   fileType: "pdf" | "image";
   size: string;
+  uploadedBy: "doctor" | "user";
+  doctorName?: string;
 }
 
 const PatientRecords = () => {
-  const [records, setRecords] = useState<MedicalRecord[]>([
+  const [userRecords, setUserRecords] = useState<MedicalRecord[]>([
     {
-      id: "1",
+      id: "u1",
+      name: "Previous Hospital Report",
+      type: "Medical History",
+      date: "Jan 12, 2026",
+      fileType: "pdf",
+      size: "320 KB",
+      uploadedBy: "user",
+    },
+    {
+      id: "u2",
+      name: "Vaccination Certificate",
+      type: "Immunization",
+      date: "Dec 15, 2025",
+      fileType: "image",
+      size: "1.1 MB",
+      uploadedBy: "user",
+    },
+  ]);
+
+  const doctorRecords: MedicalRecord[] = [
+    {
+      id: "d1",
       name: "Blood Test Results",
       type: "Lab Report",
       date: "Jan 15, 2026",
       fileType: "pdf",
       size: "245 KB",
+      uploadedBy: "doctor",
+      doctorName: "Dr. Sarah Johnson",
     },
     {
-      id: "2",
+      id: "d2",
       name: "Chest X-Ray",
       type: "Imaging",
       date: "Jan 10, 2026",
       fileType: "image",
       size: "1.2 MB",
+      uploadedBy: "doctor",
+      doctorName: "Dr. Michael Chen",
     },
     {
-      id: "3",
+      id: "d3",
       name: "General Checkup Report",
       type: "Consultation",
       date: "Dec 20, 2025",
       fileType: "pdf",
       size: "156 KB",
+      uploadedBy: "doctor",
+      doctorName: "Dr. Sarah Johnson",
     },
     {
-      id: "4",
+      id: "d4",
       name: "MRI Scan Results",
       type: "Imaging",
       date: "Dec 5, 2025",
       fileType: "image",
       size: "3.4 MB",
+      uploadedBy: "doctor",
+      doctorName: "Dr. Lisa Anderson",
     },
-  ]);
+  ];
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -88,14 +120,60 @@ const PatientRecords = () => {
         }),
         fileType: file.type.includes("pdf") ? "pdf" : "image",
         size: `${(file.size / 1024).toFixed(0)} KB`,
+        uploadedBy: "user",
       };
-      setRecords([newRecord, ...records]);
+      setUserRecords([newRecord, ...userRecords]);
     }
   };
 
   const handleDelete = (id: string) => {
-    setRecords(records.filter((record) => record.id !== id));
+    setUserRecords(userRecords.filter((record) => record.id !== id));
   };
+
+  const RecordCard = ({ record, canDelete = false }: { record: MedicalRecord; canDelete?: boolean }) => (
+    <div className="dashboard-card p-4 flex items-center justify-between hover:shadow-md transition-shadow">
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+          {record.fileType === "pdf" ? (
+            <File className="w-6 h-6 text-primary" />
+          ) : (
+            <Image className="w-6 h-6 text-primary" />
+          )}
+        </div>
+        <div>
+          <h3 className="font-medium text-foreground">{record.name}</h3>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
+            <span>{record.type}</span>
+            <span>•</span>
+            <span>{record.date}</span>
+            <span>•</span>
+            <span>{record.size}</span>
+            {record.doctorName && (
+              <>
+                <span>•</span>
+                <span className="text-primary">{record.doctorName}</span>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="sm">
+          <Download className="w-4 h-4" />
+        </Button>
+        {canDelete && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-destructive hover:text-destructive"
+            onClick={() => handleDelete(record.id)}
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <DashboardLayout
@@ -105,15 +183,13 @@ const PatientRecords = () => {
     >
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">
-              Medical Records
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Upload and manage your medical documents
-            </p>
-          </div>
+        <div>
+          <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">
+            Medical Records
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            View and manage your medical documents
+          </p>
         </div>
 
         {/* Upload Section */}
@@ -147,53 +223,55 @@ const PatientRecords = () => {
           </div>
         </div>
 
-        {/* Records List */}
-        <div className="space-y-4">
-          <h2 className="font-display text-xl font-semibold text-foreground">
-            Your Records ({records.length})
-          </h2>
-          <div className="grid gap-4">
-            {records.map((record) => (
-              <div
-                key={record.id}
-                className="dashboard-card p-4 flex items-center justify-between hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                    {record.fileType === "pdf" ? (
-                      <File className="w-6 h-6 text-primary" />
-                    ) : (
-                      <Image className="w-6 h-6 text-primary" />
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-foreground">{record.name}</h3>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span>{record.type}</span>
-                      <span>•</span>
-                      <span>{record.date}</span>
-                      <span>•</span>
-                      <span>{record.size}</span>
-                    </div>
-                  </div>
+        {/* Records Tabs */}
+        <Tabs defaultValue="doctor" className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="doctor" className="gap-2">
+              <Stethoscope className="w-4 h-4" />
+              Doctor Uploaded ({doctorRecords.length})
+            </TabsTrigger>
+            <TabsTrigger value="user" className="gap-2">
+              <User className="w-4 h-4" />
+              My Uploads ({userRecords.length})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="doctor" className="mt-6">
+            <div className="space-y-4">
+              {doctorRecords.length > 0 ? (
+                doctorRecords.map((record) => (
+                  <RecordCard key={record.id} record={record} canDelete={false} />
+                ))
+              ) : (
+                <div className="dashboard-card p-8 text-center">
+                  <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="font-semibold text-foreground">No records from doctors yet</h3>
+                  <p className="text-muted-foreground mt-2">
+                    Records uploaded by your doctors will appear here
+                  </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm">
-                    <Download className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-destructive hover:text-destructive"
-                    onClick={() => handleDelete(record.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="user" className="mt-6">
+            <div className="space-y-4">
+              {userRecords.length > 0 ? (
+                userRecords.map((record) => (
+                  <RecordCard key={record.id} record={record} canDelete={true} />
+                ))
+              ) : (
+                <div className="dashboard-card p-8 text-center">
+                  <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="font-semibold text-foreground">No uploaded records</h3>
+                  <p className="text-muted-foreground mt-2">
+                    Upload your medical documents to keep them organized
+                  </p>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </DashboardLayout>
   );
