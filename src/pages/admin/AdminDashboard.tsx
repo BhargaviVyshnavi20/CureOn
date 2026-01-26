@@ -1,7 +1,6 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import StatCard from "@/components/dashboard/StatCard";
-import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Users, Calendar, Settings, Stethoscope, UserPlus, CheckCircle2, Clock, XCircle, TrendingUp } from "lucide-react";
+import { LayoutDashboard, Users, Calendar, Settings, Stethoscope, CheckCircle2, Clock, XCircle, TrendingUp } from "lucide-react";
 
 const navItems = [
   { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -32,7 +31,6 @@ const AdminDashboard = () => {
             <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">Admin Dashboard 🛡️</h1>
             <p className="text-muted-foreground mt-1">Platform overview and management tools</p>
           </div>
-          <Button variant="hero"><UserPlus className="w-5 h-5" />Add User</Button>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">

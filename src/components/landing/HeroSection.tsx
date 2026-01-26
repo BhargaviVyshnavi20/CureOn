@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Play, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -61,14 +61,6 @@ const HeroSection = () => {
               >
                 Book Consultation
                 <ArrowRight className="w-5 h-5" />
-              </Button>
-              <Button 
-                variant="hero-outline" 
-                size="xl"
-                className="w-full sm:w-auto gap-2"
-              >
-                <Play className="w-5 h-5" />
-                Watch Demo
               </Button>
             </div>
           </div>

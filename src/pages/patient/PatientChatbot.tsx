@@ -6,11 +6,10 @@ import {
   LayoutDashboard,
   Calendar,
   FileText,
-  MessageSquare,
   Pill,
   Settings,
   Send,
-  Bot,
+  HeartPulse,
   User,
 } from "lucide-react";
 
@@ -19,8 +18,7 @@ const navItems = [
   { name: "Appointments", href: "/patient/appointments", icon: Calendar },
   { name: "Medical Records", href: "/patient/records", icon: FileText },
   { name: "Prescriptions", href: "/patient/prescriptions", icon: Pill },
-  { name: "Chatbot", href: "/patient/chatbot", icon: Bot },
-  { name: "Messages", href: "/patient/messages", icon: MessageSquare },
+  { name: "Health Assistant", href: "/patient/chatbot", icon: HeartPulse },
   { name: "Settings", href: "/patient/settings", icon: Settings },
 ];
 
@@ -135,7 +133,7 @@ const PatientChatbot = () => {
                   }`}
                 >
                   {message.sender === "bot" ? (
-                    <Bot className="w-5 h-5 text-primary" />
+                    <HeartPulse className="w-5 h-5 text-primary" />
                   ) : (
                     <User className="w-5 h-5 text-accent" />
                   )}

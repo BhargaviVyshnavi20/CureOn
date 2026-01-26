@@ -6,13 +6,12 @@ import {
   LayoutDashboard,
   Calendar,
   FileText,
-  MessageSquare,
   Pill,
   Settings,
   CalendarPlus,
   CheckCircle2,
   ArrowRight,
-  Bot,
+  HeartPulse,
 } from "lucide-react";
 
 const navItems = [
@@ -20,8 +19,7 @@ const navItems = [
   { name: "Appointments", href: "/patient/appointments", icon: Calendar },
   { name: "Medical Records", href: "/patient/records", icon: FileText },
   { name: "Prescriptions", href: "/patient/prescriptions", icon: Pill },
-  { name: "Chatbot", href: "/patient/chatbot", icon: Bot },
-  { name: "Messages", href: "/patient/messages", icon: MessageSquare },
+  { name: "Health Assistant", href: "/patient/chatbot", icon: HeartPulse },
   { name: "Settings", href: "/patient/settings", icon: Settings },
 ];
 
@@ -164,7 +162,7 @@ const PatientDashboard = () => {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { icon: Calendar, label: "Book Appointment", color: "bg-primary/10 text-primary" },
-            { icon: MessageSquare, label: "Message Doctor", color: "bg-accent/10 text-accent" },
+            { icon: HeartPulse, label: "Health Assistant", color: "bg-accent/10 text-accent" },
             { icon: FileText, label: "View Records", color: "bg-success/10 text-success" },
             { icon: Pill, label: "Refill Prescription", color: "bg-warning/10 text-warning" },
           ].map((action, index) => (

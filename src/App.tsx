@@ -11,7 +11,6 @@ import PatientAppointments from "./pages/patient/PatientAppointments";
 import PatientRecords from "./pages/patient/PatientRecords";
 import PatientPrescriptions from "./pages/patient/PatientPrescriptions";
 import PatientChatbot from "./pages/patient/PatientChatbot";
-import PatientMessages from "./pages/patient/PatientMessages";
 import PatientSettings from "./pages/patient/PatientSettings";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import DoctorAppointments from "./pages/doctor/DoctorAppointments";
@@ -42,7 +41,6 @@ const App = () => (
           <Route path="/patient/records" element={<PatientRecords />} />
           <Route path="/patient/prescriptions" element={<PatientPrescriptions />} />
           <Route path="/patient/chatbot" element={<PatientChatbot />} />
-          <Route path="/patient/messages" element={<PatientMessages />} />
           <Route path="/patient/settings" element={<PatientSettings />} />
           {/* Doctor Routes */}
           <Route path="/doctor/dashboard" element={<DoctorDashboard />} />

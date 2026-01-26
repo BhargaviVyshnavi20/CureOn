@@ -1,4 +1,6 @@
+import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import PatientHistoryModal from "@/components/doctor/PatientHistoryModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -34,6 +36,9 @@ interface Patient {
 }
 
 const DoctorPatients = () => {
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+
   const patients: Patient[] = [
     {
       id: "1",
@@ -98,6 +103,11 @@ const DoctorPatients = () => {
       totalVisits: 4,
     },
   ];
+
+  const handleViewHistory = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setHistoryModalOpen(true);
+  };
 
   return (
     <DashboardLayout
@@ -164,7 +174,7 @@ const DoctorPatients = () => {
                   <p className="text-muted-foreground">Last visit</p>
                   <p className="font-medium text-foreground">{patient.lastVisit}</p>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => handleViewHistory(patient)}>
                   <FileText className="w-4 h-4 mr-2" />
                   View History
                 </Button>
@@ -173,6 +183,13 @@ const DoctorPatients = () => {
           ))}
         </div>
       </div>
+
+      {/* Patient History Modal */}
+      <PatientHistoryModal
+        open={historyModalOpen}
+        onOpenChange={setHistoryModalOpen}
+        patient={selectedPatient}
+      />
     </DashboardLayout>
   );
 };

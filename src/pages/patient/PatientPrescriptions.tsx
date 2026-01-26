@@ -5,13 +5,12 @@ import {
   LayoutDashboard,
   Calendar,
   FileText,
-  MessageSquare,
   Pill,
   Settings,
   Clock,
   CheckCircle2,
   RefreshCw,
-  Bot,
+  HeartPulse,
 } from "lucide-react";
 
 const navItems = [
@@ -19,8 +18,7 @@ const navItems = [
   { name: "Appointments", href: "/patient/appointments", icon: Calendar },
   { name: "Medical Records", href: "/patient/records", icon: FileText },
   { name: "Prescriptions", href: "/patient/prescriptions", icon: Pill },
-  { name: "Chatbot", href: "/patient/chatbot", icon: Bot },
-  { name: "Messages", href: "/patient/messages", icon: MessageSquare },
+  { name: "Health Assistant", href: "/patient/chatbot", icon: HeartPulse },
   { name: "Settings", href: "/patient/settings", icon: Settings },
 ];
 
