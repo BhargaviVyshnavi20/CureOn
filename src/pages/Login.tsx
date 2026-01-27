@@ -125,8 +125,8 @@ const Login = () => {
       <div className="hidden lg:block flex-1 relative">
         <div className="absolute inset-0 bg-primary/10" />
         <img
-          src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
-          alt="Healthcare"
+          src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+          alt="Doctor with stethoscope"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-transparent to-transparent" />

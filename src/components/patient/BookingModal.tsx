@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
@@ -16,11 +14,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Heart, Brain, Bone, Stethoscope, Eye, Baby, Smile } from "lucide-react";
+import { Heart, Brain, Bone, Stethoscope, Eye, Baby, Smile, Clock } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface BookingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onBookingConfirmed?: (booking: BookingData) => void;
+}
+
+interface BookingData {
+  specialization: string;
+  date: Date;
+  time: string;
 }
 
 const specializations = [
@@ -33,19 +41,28 @@ const specializations = [
   { id: "derma", name: "Dermatologist", icon: Smile, description: "Skin care specialist" },
 ];
 
-const BookingModal = ({ open, onOpenChange }: BookingModalProps) => {
+const timeSlots = [
+  "9:00 AM",
+  "9:30 AM",
+  "10:00 AM",
+  "10:30 AM",
+  "11:00 AM",
+  "11:30 AM",
+  "2:00 PM",
+  "2:30 PM",
+  "3:00 PM",
+  "3:30 PM",
+  "4:00 PM",
+  "4:30 PM",
+];
+
+const BookingModal = ({ open, onOpenChange, onBookingConfirmed }: BookingModalProps) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    patientName: "",
-    age: "",
-    gender: "",
-    symptoms: "",
     specialization: "",
+    date: undefined as Date | undefined,
+    time: "",
   });
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
 
   const handleSpecializationSelect = (id: string) => {
     setFormData((prev) => ({ ...prev, specialization: id }));
@@ -53,31 +70,47 @@ const BookingModal = ({ open, onOpenChange }: BookingModalProps) => {
   };
 
   const handleSubmit = () => {
-    console.log("Booking submitted:", formData);
+    if (formData.date && formData.time && onBookingConfirmed) {
+      onBookingConfirmed({
+        specialization: formData.specialization,
+        date: formData.date,
+        time: formData.time,
+      });
+    }
     // Reset form and close modal
     setStep(1);
     setFormData({
-      patientName: "",
-      age: "",
-      gender: "",
-      symptoms: "",
       specialization: "",
+      date: undefined,
+      time: "",
     });
     onOpenChange(false);
   };
 
   const handleBack = () => {
+    if (step === 2) {
+      setStep(1);
+    }
+  };
+
+  const handleClose = () => {
     setStep(1);
+    setFormData({
+      specialization: "",
+      date: undefined,
+      time: "",
+    });
+    onOpenChange(false);
   };
 
   const selectedSpec = specializations.find((s) => s.id === formData.specialization);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">
-            {step === 1 ? "Select Doctor Type" : "Patient Details"}
+            {step === 1 ? "Select Doctor Type" : "Choose Date & Time"}
           </DialogTitle>
         </DialogHeader>
 
@@ -123,61 +156,56 @@ const BookingModal = ({ open, onOpenChange }: BookingModalProps) => {
               </div>
             )}
 
-            {/* Patient Name */}
+            {/* Date Selection */}
             <div className="space-y-2">
-              <Label htmlFor="patientName">Patient Name</Label>
-              <Input
-                id="patientName"
-                placeholder="Enter patient's full name"
-                value={formData.patientName}
-                onChange={(e) => handleInputChange("patientName", e.target.value)}
+              <Label>Select Date</Label>
+              <Calendar
+                mode="single"
+                selected={formData.date}
+                onSelect={(date) => setFormData((prev) => ({ ...prev, date }))}
+                disabled={(date) => date < new Date()}
+                className={cn("rounded-md border pointer-events-auto")}
               />
             </div>
 
-            {/* Age and Gender */}
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="age">Age</Label>
-                <Input
-                  id="age"
-                  type="number"
-                  placeholder="Enter age"
-                  value={formData.age}
-                  onChange={(e) => handleInputChange("age", e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="gender">Gender</Label>
-                <Select
-                  value={formData.gender}
-                  onValueChange={(value) => handleInputChange("gender", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select gender" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Time Selection */}
+            <div className="space-y-2">
+              <Label>Select Time Slot</Label>
+              <Select
+                value={formData.time}
+                onValueChange={(value) => setFormData((prev) => ({ ...prev, time: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a time slot">
+                    {formData.time && (
+                      <span className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        {formData.time}
+                      </span>
+                    )}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {timeSlots.map((time) => (
+                    <SelectItem key={time} value={time}>
+                      {time}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Symptoms */}
-            <div className="space-y-2">
-              <Label htmlFor="symptoms">Describe Your Symptoms</Label>
-              <Textarea
-                id="symptoms"
-                placeholder="Tell us about your health concern in simple words..."
-                value={formData.symptoms}
-                onChange={(e) => handleInputChange("symptoms", e.target.value)}
-                rows={4}
-              />
-              <p className="text-xs text-muted-foreground">
-                Example: "I have been having headaches for 3 days"
-              </p>
-            </div>
+            {/* Booking Summary */}
+            {formData.date && formData.time && (
+              <div className="p-4 rounded-xl bg-success/10 border border-success/20">
+                <h4 className="font-medium text-foreground mb-2">Booking Summary</h4>
+                <div className="space-y-1 text-sm text-muted-foreground">
+                  <p>Doctor: {selectedSpec?.name}</p>
+                  <p>Date: {format(formData.date, "MMMM d, yyyy")}</p>
+                  <p>Time: {formData.time}</p>
+                </div>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="flex gap-3 pt-4">
@@ -188,7 +216,7 @@ const BookingModal = ({ open, onOpenChange }: BookingModalProps) => {
                 variant="hero"
                 onClick={handleSubmit}
                 className="flex-1"
-                disabled={!formData.patientName || !formData.age || !formData.gender || !formData.symptoms}
+                disabled={!formData.date || !formData.time}
               >
                 Confirm Booking
               </Button>

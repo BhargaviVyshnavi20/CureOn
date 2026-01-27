@@ -1,18 +1,19 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import StatCard from "@/components/dashboard/StatCard";
 import AppointmentCard from "@/components/dashboard/AppointmentCard";
-import { Button } from "@/components/ui/button";
+import LanguageSelector from "@/components/dashboard/LanguageSelector";
 import {
   LayoutDashboard,
   Calendar,
   FileText,
   Pill,
   Settings,
-  CalendarPlus,
   CheckCircle2,
   ArrowRight,
   HeartPulse,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const navItems = [
   { name: "Dashboard", href: "/patient/dashboard", icon: LayoutDashboard },
@@ -24,6 +25,8 @@ const navItems = [
 ];
 
 const PatientDashboard = () => {
+  const navigate = useNavigate();
+  
   const upcomingAppointments = [
     {
       doctorName: "Sarah Johnson",
@@ -58,7 +61,7 @@ const PatientDashboard = () => {
       userName="Alex Thompson"
     >
       <div className="space-y-8">
-        {/* Welcome Section */}
+        {/* Welcome Section with Language Selector */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">
@@ -68,13 +71,10 @@ const PatientDashboard = () => {
               Here's an overview of your health journey
             </p>
           </div>
-          <Button variant="hero">
-            <CalendarPlus className="w-5 h-5" />
-            Book Appointment
-          </Button>
+          <LanguageSelector />
         </div>
 
-        {/* Stats Grid - Removed Health Score */}
+        {/* Stats Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
           <StatCard
             title="Upcoming Appointments"
@@ -109,7 +109,7 @@ const PatientDashboard = () => {
               <h2 className="font-display text-xl font-semibold text-foreground">
                 Upcoming Appointments
               </h2>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/patient/appointments")}>
                 View All
                 <ArrowRight className="w-4 h-4" />
               </Button>
@@ -131,7 +131,7 @@ const PatientDashboard = () => {
               <h2 className="font-display text-xl font-semibold text-foreground">
                 Recent Records
               </h2>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/patient/records")}>
                 View All
                 <ArrowRight className="w-4 h-4" />
               </Button>
@@ -156,26 +156,6 @@ const PatientDashboard = () => {
               ))}
             </div>
           </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { icon: Calendar, label: "Book Appointment", color: "bg-primary/10 text-primary" },
-            { icon: HeartPulse, label: "Health Assistant", color: "bg-accent/10 text-accent" },
-            { icon: FileText, label: "View Records", color: "bg-success/10 text-success" },
-            { icon: Pill, label: "Refill Prescription", color: "bg-warning/10 text-warning" },
-          ].map((action, index) => (
-            <button
-              key={index}
-              className="dashboard-card p-5 flex items-center gap-4 hover:shadow-md transition-shadow text-left"
-            >
-              <div className={`w-12 h-12 rounded-xl ${action.color} flex items-center justify-center`}>
-                <action.icon className="w-6 h-6" />
-              </div>
-              <span className="font-medium text-foreground">{action.label}</span>
-            </button>
-          ))}
         </div>
       </div>
     </DashboardLayout>

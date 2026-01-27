@@ -3,7 +3,39 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import AddDoctorModal from "@/components/admin/AddDoctorModal";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Stethoscope, Calendar, Settings, Search, Mail, Phone, MoreHorizontal, UserPlus } from "lucide-react";
+import {
+  LayoutDashboard,
+  Stethoscope,
+  Calendar,
+  Settings,
+  Search,
+  Mail,
+  Phone,
+  MoreVertical,
+  UserPlus,
+  Pencil,
+  Trash2,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const navItems = [
   { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -22,8 +54,23 @@ interface Doctor {
   patients: number;
 }
 
+const specializations = [
+  "General Physician",
+  "Cardiologist",
+  "Neurologist",
+  "Orthopedic",
+  "Dermatologist",
+  "Pediatrician",
+  "Ophthalmologist",
+  "Psychiatrist",
+  "ENT Specialist",
+  "Gynecologist",
+];
+
 const AdminDoctors = () => {
   const [addDoctorModalOpen, setAddDoctorModalOpen] = useState(false);
+  const [editDoctorModalOpen, setEditDoctorModalOpen] = useState(false);
+  const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
   const [doctors, setDoctors] = useState<Doctor[]>([
     { id: "1", name: "Dr. Sarah Johnson", specialty: "General Physician", email: "sarah.j@medicare.com", phone: "+1 (555) 123-4567", status: "active", patients: 248 },
     { id: "2", name: "Dr. Michael Chen", specialty: "Cardiologist", email: "michael.c@medicare.com", phone: "+1 (555) 234-5678", status: "active", patients: 186 },
@@ -44,6 +91,23 @@ const AdminDoctors = () => {
       patients: 0,
     };
     setDoctors((prev) => [...prev, newDoctor]);
+  };
+
+  const handleEditClick = (doctor: Doctor) => {
+    setEditingDoctor(doctor);
+    setEditDoctorModalOpen(true);
+  };
+
+  const handleDeleteClick = (doctorId: string) => {
+    setDoctors(doctors.filter((d) => d.id !== doctorId));
+  };
+
+  const handleEditSave = () => {
+    if (editingDoctor) {
+      setDoctors(doctors.map((d) => (d.id === editingDoctor.id ? editingDoctor : d)));
+      setEditDoctorModalOpen(false);
+      setEditingDoctor(null);
+    }
   };
 
   return (
@@ -78,9 +142,26 @@ const AdminDoctors = () => {
                     <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
                   </div>
                 </div>
-                <button className="p-2 rounded-lg hover:bg-secondary">
-                  <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
-                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="p-2 rounded-lg hover:bg-secondary">
+                      <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleEditClick(doctor)}>
+                      <Pencil className="w-4 h-4 mr-2" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDeleteClick(doctor.id)}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
               <div className="space-y-2 text-sm mb-4">
                 <div className="flex items-center gap-2 text-muted-foreground">
@@ -107,6 +188,76 @@ const AdminDoctors = () => {
         onOpenChange={setAddDoctorModalOpen}
         onDoctorAdded={handleDoctorAdded}
       />
+
+      {/* Edit Doctor Modal */}
+      <Dialog open={editDoctorModalOpen} onOpenChange={setEditDoctorModalOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl flex items-center gap-2">
+              <Pencil className="w-5 h-5 text-primary" />
+              Edit Doctor
+            </DialogTitle>
+          </DialogHeader>
+          {editingDoctor && (
+            <div className="py-4 space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="edit-name">Doctor Name</Label>
+                <Input
+                  id="edit-name"
+                  value={editingDoctor.name}
+                  onChange={(e) => setEditingDoctor({ ...editingDoctor, name: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-specialty">Specialization</Label>
+                <Select
+                  value={editingDoctor.specialty}
+                  onValueChange={(value) => setEditingDoctor({ ...editingDoctor, specialty: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {specializations.map((spec) => (
+                      <SelectItem key={spec} value={spec}>
+                        {spec}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-email">Email</Label>
+                  <Input
+                    id="edit-email"
+                    type="email"
+                    value={editingDoctor.email}
+                    onChange={(e) => setEditingDoctor({ ...editingDoctor, email: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-phone">Phone</Label>
+                  <Input
+                    id="edit-phone"
+                    type="tel"
+                    value={editingDoctor.phone}
+                    onChange={(e) => setEditingDoctor({ ...editingDoctor, phone: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3 pt-4">
+                <Button variant="outline" onClick={() => setEditDoctorModalOpen(false)} className="flex-1">
+                  Cancel
+                </Button>
+                <Button variant="hero" onClick={handleEditSave} className="flex-1">
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };

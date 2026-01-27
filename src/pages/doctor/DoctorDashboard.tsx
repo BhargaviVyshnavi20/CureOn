@@ -12,6 +12,7 @@ import {
   Video,
   ArrowRight,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const navItems = [
   { name: "Dashboard", href: "/doctor/dashboard", icon: LayoutDashboard },
@@ -22,6 +23,8 @@ const navItems = [
 ];
 
 const DoctorDashboard = () => {
+  const navigate = useNavigate();
+
   const todayAppointments = [
     {
       patientName: "Emily Rodriguez",
@@ -48,12 +51,6 @@ const DoctorDashboard = () => {
     },
   ];
 
-  const recentPatients = [
-    { name: "Michael Brown", condition: "Hypertension", lastVisit: "2 days ago" },
-    { name: "Lisa Anderson", condition: "Diabetes Type 2", lastVisit: "1 week ago" },
-    { name: "David Martinez", condition: "Routine Checkup", lastVisit: "2 weeks ago" },
-  ];
-
   const weeklySchedule = [
     { day: "Mon", slots: 8, booked: 6 },
     { day: "Tue", slots: 8, booked: 8 },
@@ -70,7 +67,7 @@ const DoctorDashboard = () => {
       userAvatar="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"
     >
       <div className="space-y-8">
-        {/* Welcome Section - Removed buttons */}
+        {/* Welcome Section */}
         <div>
           <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">
             Good morning, Dr. Johnson! 🩺
@@ -80,7 +77,7 @@ const DoctorDashboard = () => {
           </p>
         </div>
 
-        {/* Stats Grid - Removed Average Rating */}
+        {/* Stats Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
           <StatCard
             title="Today's Appointments"
@@ -117,7 +114,7 @@ const DoctorDashboard = () => {
               <h2 className="font-display text-xl font-semibold text-foreground">
                 Today's Schedule
               </h2>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/doctor/appointments")}>
                 View Full Schedule
                 <ArrowRight className="w-4 h-4" />
               </Button>
@@ -164,39 +161,6 @@ const DoctorDashboard = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Recent Patients */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-xl font-semibold text-foreground">
-              Recent Patients
-            </h2>
-            <Button variant="ghost" size="sm">
-              View All Patients
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {recentPatients.map((patient, index) => (
-              <div key={index} className="dashboard-card p-5 hover-lift cursor-pointer">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center">
-                    <span className="text-foreground font-semibold">
-                      {patient.name.charAt(0)}
-                    </span>
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-medium text-foreground truncate">{patient.name}</p>
-                    <p className="text-sm text-muted-foreground">{patient.condition}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Last visit: {patient.lastVisit}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </div>

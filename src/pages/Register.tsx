@@ -3,24 +3,36 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, CheckCircle2 } from "lucide-react";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, CheckCircle2, Phone } from "lucide-react";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [step, setStep] = useState<"form" | "otp">("form");
+  const [otp, setOtp] = useState("");
   const [formData, setFormData] = useState({
     name: "",
+    phone: "",
     email: "",
     password: "",
-    userType: "patient" as "patient" | "doctor",
+    confirmPassword: "",
   });
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.userType === "patient") {
+    if (formData.password !== formData.confirmPassword) {
+      return;
+    }
+    // Move to OTP verification step
+    setStep("otp");
+  };
+
+  const handleOtpSubmit = () => {
+    if (otp.length === 4) {
+      // Simulate OTP verification success
       navigate("/patient/dashboard");
-    } else {
-      navigate("/doctor/dashboard");
     }
   };
 
@@ -30,6 +42,77 @@ const Register = () => {
     "Video consultations 24/7",
     "Secure & private platform",
   ];
+
+  if (step === "otp") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="w-full max-w-md">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 mb-8 justify-center">
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-xl">M</span>
+            </div>
+            <span className="font-display font-bold text-xl text-foreground">
+              MediCare
+            </span>
+          </Link>
+
+          <div className="dashboard-card p-8 text-center">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+              <Phone className="w-8 h-8 text-primary" />
+            </div>
+            
+            <h1 className="font-display text-2xl font-bold text-foreground mb-2">
+              Verify Your Phone
+            </h1>
+            <p className="text-muted-foreground mb-8">
+              We've sent a 4-digit code to <span className="font-medium text-foreground">{formData.phone}</span>
+            </p>
+
+            <div className="flex justify-center mb-6">
+              <InputOTP
+                maxLength={4}
+                value={otp}
+                onChange={(value) => setOtp(value)}
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                  <InputOTPSlot index={3} />
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+
+            <Button
+              variant="hero"
+              size="lg"
+              className="w-full"
+              onClick={handleOtpSubmit}
+              disabled={otp.length !== 4}
+            >
+              Verify & Continue
+              <ArrowRight className="w-5 h-5" />
+            </Button>
+
+            <p className="text-sm text-muted-foreground mt-6">
+              Didn't receive the code?{" "}
+              <button className="text-primary font-medium hover:underline">
+                Resend OTP
+              </button>
+            </p>
+
+            <button
+              onClick={() => setStep("form")}
+              className="text-sm text-muted-foreground mt-4 hover:text-foreground"
+            >
+              ← Back to registration
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -85,26 +168,10 @@ const Register = () => {
             Fill in your details to get started
           </p>
 
-          {/* User Type Selection */}
-          <div className="flex gap-2 mb-8 p-1 bg-secondary rounded-xl">
-            {(["patient", "doctor"] as const).map((type) => (
-              <button
-                key={type}
-                onClick={() => setFormData({ ...formData, userType: type })}
-                className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all capitalize ${
-                  formData.userType === type
-                    ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {type === "patient" ? "Patient" : "Healthcare Provider"}
-              </button>
-            ))}
-          </div>
-
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Full Name */}
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">Full Name *</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
@@ -114,12 +181,31 @@ const Register = () => {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="pl-10 input-healthcare"
+                  required
                 />
               </div>
             </div>
 
+            {/* Phone Number */}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="phone">Phone Number *</Label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="pl-10 input-healthcare"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Email (Optional) */}
+            <div className="space-y-2">
+              <Label htmlFor="email">Email (Optional)</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
@@ -133,8 +219,9 @@ const Register = () => {
               </div>
             </div>
 
+            {/* Password */}
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Password *</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
@@ -144,6 +231,7 @@ const Register = () => {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className="pl-10 pr-10 input-healthcare"
+                  required
                 />
                 <button
                   type="button"
@@ -158,7 +246,40 @@ const Register = () => {
               </p>
             </div>
 
-            <Button type="submit" variant="hero" size="lg" className="w-full">
+            {/* Confirm Password */}
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password *</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm your password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  className="pl-10 pr-10 input-healthcare"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                <p className="text-xs text-destructive">Passwords do not match</p>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              variant="hero"
+              size="lg"
+              className="w-full"
+              disabled={!formData.name || !formData.phone || !formData.password || !formData.confirmPassword || formData.password !== formData.confirmPassword}
+            >
               Create Account
               <ArrowRight className="w-5 h-5" />
             </Button>

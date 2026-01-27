@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import PatientHistoryModal from "@/components/doctor/PatientHistoryModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   LayoutDashboard,
   Calendar,
@@ -13,6 +14,7 @@ import {
   FileText,
   Phone,
   Mail,
+  Upload,
 } from "lucide-react";
 
 const navItems = [
@@ -38,6 +40,7 @@ interface Patient {
 const DoctorPatients = () => {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const patients: Patient[] = [
     {
@@ -109,6 +112,26 @@ const DoctorPatients = () => {
     setHistoryModalOpen(true);
   };
 
+  const handleUploadClick = (patientId: string) => {
+    const input = fileInputRefs.current[patientId];
+    if (input) {
+      input.click();
+    }
+  };
+
+  const handleFileUpload = (patientId: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      console.log(`Uploading file for patient ${patientId}:`, files[0].name);
+      // Here you would handle the actual upload
+    }
+    // Reset input
+    const input = fileInputRefs.current[patientId];
+    if (input) {
+      input.value = "";
+    }
+  };
+
   return (
     <DashboardLayout
       navItems={navItems}
@@ -174,10 +197,22 @@ const DoctorPatients = () => {
                   <p className="text-muted-foreground">Last visit</p>
                   <p className="font-medium text-foreground">{patient.lastVisit}</p>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => handleViewHistory(patient)}>
-                  <FileText className="w-4 h-4 mr-2" />
-                  View History
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Input
+                    ref={(el) => { fileInputRefs.current[patient.id] = el; }}
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    className="hidden"
+                    onChange={(e) => handleFileUpload(patient.id, e)}
+                  />
+                  <Button variant="outline" size="sm" onClick={() => handleUploadClick(patient.id)}>
+                    <Upload className="w-4 h-4" />
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => handleViewHistory(patient)}>
+                    <FileText className="w-4 h-4 mr-2" />
+                    History
+                  </Button>
+                </div>
               </div>
             </div>
           ))}

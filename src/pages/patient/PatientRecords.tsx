@@ -10,14 +10,13 @@ import {
   FileText,
   Pill,
   Settings,
-  Upload,
   File,
   Image,
-  Trash2,
   Download,
   HeartPulse,
   Stethoscope,
   User,
+  Upload,
 } from "lucide-react";
 
 const navItems = [
@@ -38,29 +37,25 @@ interface MedicalRecord {
   size: string;
   uploadedBy: "doctor" | "user";
   doctorName?: string;
+  fileName?: string;
 }
 
+const defaultUserRecords = [
+  { id: "u1", name: "Blood Test Report", placeholder: true },
+  { id: "u2", name: "X-Ray Images", placeholder: true },
+  { id: "u3", name: "Prescription History", placeholder: true },
+  { id: "u4", name: "Vaccination Records", placeholder: true },
+  { id: "u5", name: "Insurance Documents", placeholder: true },
+];
+
 const PatientRecords = () => {
-  const [userRecords, setUserRecords] = useState<MedicalRecord[]>([
-    {
-      id: "u1",
-      name: "Previous Hospital Report",
-      type: "Medical History",
-      date: "Jan 12, 2026",
-      fileType: "pdf",
-      size: "320 KB",
-      uploadedBy: "user",
-    },
-    {
-      id: "u2",
-      name: "Vaccination Certificate",
-      type: "Immunization",
-      date: "Dec 15, 2025",
-      fileType: "image",
-      size: "1.1 MB",
-      uploadedBy: "user",
-    },
-  ]);
+  const [userRecords, setUserRecords] = useState<Record<string, MedicalRecord | null>>({
+    u1: null,
+    u2: null,
+    u3: null,
+    u4: null,
+    u5: null,
+  });
 
   const doctorRecords: MedicalRecord[] = [
     {
@@ -105,13 +100,14 @@ const PatientRecords = () => {
     },
   ];
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (recordId: string, event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
       const file = files[0];
+      const record = defaultUserRecords.find(r => r.id === recordId);
       const newRecord: MedicalRecord = {
-        id: Date.now().toString(),
-        name: file.name,
+        id: recordId,
+        name: record?.name || file.name,
         type: "Uploaded Document",
         date: new Date().toLocaleDateString("en-US", {
           month: "short",
@@ -121,16 +117,13 @@ const PatientRecords = () => {
         fileType: file.type.includes("pdf") ? "pdf" : "image",
         size: `${(file.size / 1024).toFixed(0)} KB`,
         uploadedBy: "user",
+        fileName: file.name,
       };
-      setUserRecords([newRecord, ...userRecords]);
+      setUserRecords(prev => ({ ...prev, [recordId]: newRecord }));
     }
   };
 
-  const handleDelete = (id: string) => {
-    setUserRecords(userRecords.filter((record) => record.id !== id));
-  };
-
-  const RecordCard = ({ record, canDelete = false }: { record: MedicalRecord; canDelete?: boolean }) => (
+  const RecordCard = ({ record }: { record: MedicalRecord }) => (
     <div className="dashboard-card p-4 flex items-center justify-between hover:shadow-md transition-shadow">
       <div className="flex items-center gap-4">
         <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -157,20 +150,64 @@ const PatientRecords = () => {
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm">
-          <Download className="w-4 h-4" />
-        </Button>
-        {canDelete && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-destructive hover:text-destructive"
-            onClick={() => handleDelete(record.id)}
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
-        )}
+      <Button variant="ghost" size="sm">
+        <Download className="w-4 h-4" />
+      </Button>
+    </div>
+  );
+
+  const UserRecordSlot = ({ recordDef, uploadedRecord }: { recordDef: { id: string; name: string }; uploadedRecord: MedicalRecord | null }) => (
+    <div className="dashboard-card p-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${uploadedRecord ? "bg-success/10" : "bg-muted"}`}>
+            {uploadedRecord ? (
+              uploadedRecord.fileType === "pdf" ? (
+                <File className="w-6 h-6 text-success" />
+              ) : (
+                <Image className="w-6 h-6 text-success" />
+              )
+            ) : (
+              <FileText className="w-6 h-6 text-muted-foreground" />
+            )}
+          </div>
+          <div>
+            <h3 className="font-medium text-foreground">{recordDef.name}</h3>
+            {uploadedRecord ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>{uploadedRecord.fileName}</span>
+                <span>•</span>
+                <span>{uploadedRecord.date}</span>
+                <span>•</span>
+                <span>{uploadedRecord.size}</span>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No file uploaded</p>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {uploadedRecord && (
+            <Button variant="ghost" size="sm">
+              <Download className="w-4 h-4" />
+            </Button>
+          )}
+          <Label htmlFor={`file-${recordDef.id}`} className="cursor-pointer">
+            <Input
+              id={`file-${recordDef.id}`}
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              className="hidden"
+              onChange={(e) => handleFileUpload(recordDef.id, e)}
+            />
+            <Button variant="outline" size="sm" asChild>
+              <span>
+                <Upload className="w-4 h-4 mr-2" />
+                {uploadedRecord ? "Update" : "Choose File"}
+              </span>
+            </Button>
+          </Label>
+        </div>
       </div>
     </div>
   );
@@ -192,37 +229,6 @@ const PatientRecords = () => {
           </p>
         </div>
 
-        {/* Upload Section */}
-        <div className="dashboard-card p-6">
-          <h2 className="font-display text-lg font-semibold text-foreground mb-4">
-            Upload New Record
-          </h2>
-          <div className="border-2 border-dashed border-border rounded-xl p-8 text-center">
-            <Upload className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="font-medium text-foreground mb-2">
-              Drop files here or click to upload
-            </h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Supports PDF, JPG, PNG (Max 10MB)
-            </p>
-            <Label htmlFor="file-upload" className="cursor-pointer">
-              <Input
-                id="file-upload"
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
-                className="hidden"
-                onChange={handleFileUpload}
-              />
-              <Button variant="outline" asChild>
-                <span>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Choose File
-                </span>
-              </Button>
-            </Label>
-          </div>
-        </div>
-
         {/* Records Tabs */}
         <Tabs defaultValue="doctor" className="w-full">
           <TabsList className="grid w-full max-w-md grid-cols-2">
@@ -232,7 +238,7 @@ const PatientRecords = () => {
             </TabsTrigger>
             <TabsTrigger value="user" className="gap-2">
               <User className="w-4 h-4" />
-              My Uploads ({userRecords.length})
+              My Uploads
             </TabsTrigger>
           </TabsList>
 
@@ -240,7 +246,7 @@ const PatientRecords = () => {
             <div className="space-y-4">
               {doctorRecords.length > 0 ? (
                 doctorRecords.map((record) => (
-                  <RecordCard key={record.id} record={record} canDelete={false} />
+                  <RecordCard key={record.id} record={record} />
                 ))
               ) : (
                 <div className="dashboard-card p-8 text-center">
@@ -256,19 +262,13 @@ const PatientRecords = () => {
 
           <TabsContent value="user" className="mt-6">
             <div className="space-y-4">
-              {userRecords.length > 0 ? (
-                userRecords.map((record) => (
-                  <RecordCard key={record.id} record={record} canDelete={true} />
-                ))
-              ) : (
-                <div className="dashboard-card p-8 text-center">
-                  <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="font-semibold text-foreground">No uploaded records</h3>
-                  <p className="text-muted-foreground mt-2">
-                    Upload your medical documents to keep them organized
-                  </p>
-                </div>
-              )}
+              {defaultUserRecords.map((recordDef) => (
+                <UserRecordSlot
+                  key={recordDef.id}
+                  recordDef={recordDef}
+                  uploadedRecord={userRecords[recordDef.id]}
+                />
+              ))}
             </div>
           </TabsContent>
         </Tabs>
