@@ -1,5 +1,9 @@
 import { useState } from "react";
+<<<<<<< HEAD
+import { Link, useNavigate } from "react-router-dom";
+=======
 import { Link } from "react-router-dom";
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import AddPatientModal from "@/components/admin/AddPatientModal";
 import { Input } from "@/components/ui/input";
@@ -53,6 +57,10 @@ const navItems = [
 ];
 
 const AdminPatients = () => {
+<<<<<<< HEAD
+  const navigate = useNavigate();
+=======
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
   const [addPatientModalOpen, setAddPatientModalOpen] = useState(false);
   const [editPatientModalOpen, setEditPatientModalOpen] = useState(false);
   const [editingPatient, setEditingPatient] = useState(null);
@@ -118,7 +126,12 @@ const AdminPatients = () => {
           {patients.map((patient) => (
             <div 
               key={patient.id} 
+<<<<<<< HEAD
+              className="dashboard-card relative hover:shadow-lg transition-all group cursor-pointer"
+              onClick={() => navigate(`/admin/patients/${patient.id}`)}
+=======
               className="dashboard-card relative hover:shadow-lg transition-all group"
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
             >
               <div className="block p-5">
                 <div className="flex items-start justify-between mb-4">

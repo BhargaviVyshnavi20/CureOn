@@ -35,11 +35,26 @@ const PatientPrescriptions = () => {
     {
       id: "1",
       date: new Date(2026, 0, 20),
+<<<<<<< HEAD
+      prescribedBy: `${t('common.dr')} Sarah Johnson`,
+=======
       prescribedBy: "Dr. Sarah Johnson",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
       status: "Active",
       medicines: [
         {
           name: "Amoxicillin 500mg",
+<<<<<<< HEAD
+          dosage: `1 ${t('prescriptions.dosage.tablet')}`,
+          frequency: t('prescriptions.dosage.timesDaily', { count: 3 }),
+          duration: `7 ${t('prescriptions.dosage.days')}`,
+        },
+        {
+          name: "Paracetamol 500mg",
+          dosage: `1 ${t('prescriptions.dosage.tablet')}`,
+          frequency: t('prescriptions.dosage.asNeeded'),
+          duration: `5 ${t('prescriptions.dosage.days')}`,
+=======
           dosage: "1 tablet",
           frequency: "3 times daily",
           duration: "7 days",
@@ -49,17 +64,33 @@ const PatientPrescriptions = () => {
           dosage: "1 tablet",
           frequency: "As needed",
           duration: "5 days",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
         },
       ],
     },
     {
       id: "2",
       date: new Date(2026, 0, 15),
+<<<<<<< HEAD
+      prescribedBy: `${t('common.dr')} Michael Chen`,
+=======
       prescribedBy: "Dr. Michael Chen",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
       status: "Active",
       medicines: [
         {
           name: "Lisinopril 10mg",
+<<<<<<< HEAD
+          dosage: `1 ${t('prescriptions.dosage.tablet')}`,
+          frequency: t('prescriptions.dosage.onceDaily'),
+          duration: `30 ${t('prescriptions.dosage.days')}`,
+        },
+        {
+          name: "Atorvastatin 20mg",
+          dosage: `1 ${t('prescriptions.dosage.tablet')}`,
+          frequency: t('prescriptions.dosage.atNight'),
+          duration: `30 ${t('prescriptions.dosage.days')}`,
+=======
           dosage: "1 tablet",
           frequency: "Once daily",
           duration: "30 days",
@@ -69,54 +100,90 @@ const PatientPrescriptions = () => {
           dosage: "1 tablet",
           frequency: "At night",
           duration: "30 days",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
         },
       ],
     },
     {
       id: "3",
       date: new Date(2026, 0, 10),
+<<<<<<< HEAD
+      prescribedBy: `${t('common.dr')} Lisa Anderson`,
+=======
       prescribedBy: "Dr. Lisa Anderson",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
       status: "Active",
       medicines: [
         {
           name: "Metformin 500mg",
+<<<<<<< HEAD
+          dosage: `1 ${t('prescriptions.dosage.tablet')}`,
+          frequency: t('prescriptions.dosage.twiceDaily'),
+          duration: `30 ${t('prescriptions.dosage.days')}`,
+=======
           dosage: "1 tablet",
           frequency: "Twice daily",
           duration: "30 days",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
         },
       ],
     },
     {
       id: "4",
       date: new Date(2025, 11, 28),
+<<<<<<< HEAD
+      prescribedBy: `${t('common.dr')} Sarah Johnson`,
+=======
       prescribedBy: "Dr. Sarah Johnson",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
       status: "Completed",
       medicines: [
         {
           name: "Azithromycin 500mg",
+<<<<<<< HEAD
+          dosage: `1 ${t('prescriptions.dosage.tablet')}`,
+          frequency: t('prescriptions.dosage.onceDaily'),
+          duration: `3 ${t('prescriptions.dosage.days')}`,
+=======
           dosage: "1 tablet",
           frequency: "Once daily",
           duration: "3 days",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
         },
         {
           name: "Cough Syrup",
           dosage: "10ml",
+<<<<<<< HEAD
+          frequency: t('prescriptions.dosage.timesDaily', { count: 3 }),
+          duration: `5 ${t('prescriptions.dosage.days')}`,
+=======
           frequency: "3 times daily",
           duration: "5 days",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
         },
       ],
     },
     {
       id: "5",
       date: new Date(2025, 11, 15),
+<<<<<<< HEAD
+      prescribedBy: `${t('common.dr')} James Wilson`,
+=======
       prescribedBy: "Dr. James Wilson",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
       status: "Completed",
       medicines: [
         {
           name: "Ibuprofen 400mg",
+<<<<<<< HEAD
+          dosage: `1 ${t('prescriptions.dosage.tablet')}`,
+          frequency: t('prescriptions.dosage.twiceDaily'),
+          duration: `5 ${t('prescriptions.dosage.days')}`,
+=======
           dosage: "1 tablet",
           frequency: "Twice daily",
           duration: "5 days",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
         },
       ],
     },

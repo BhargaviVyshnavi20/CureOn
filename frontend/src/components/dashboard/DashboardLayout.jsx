@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import {
   Menu,
   X,
+<<<<<<< HEAD
+=======
   Bell,
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
   Search,
   ChevronDown,
   LogOut,
@@ -64,8 +67,13 @@ const DashboardLayout = ({
                 <Stethoscope className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="font-display font-bold text-lg text-sidebar-foreground">
+<<<<<<< HEAD
+            {t('landing.brandName')}
+          </span>
+=======
                 MediCare
               </span>
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
             </Link>
             <button
               className="lg:hidden p-2 rounded-lg hover:bg-sidebar-accent"
@@ -127,12 +135,15 @@ const DashboardLayout = ({
             {/* Language Selector - Only for Patients */}
             {userType === 'patient' && <LanguageSelector />}
 
+<<<<<<< HEAD
+=======
             {/* Notifications */}
             <button className="relative p-2 rounded-lg hover:bg-secondary transition-colors">
               <Bell className="w-5 h-5 text-muted-foreground" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full" />
             </button>
 
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

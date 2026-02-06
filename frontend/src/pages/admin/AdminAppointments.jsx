@@ -35,6 +35,10 @@ const AdminAppointments = () => {
   const [rescheduleModalOpen, setRescheduleModalOpen] = useState(false);
   const [manageModalOpen, setManageModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
+<<<<<<< HEAD
+  const [filterType, setFilterType] = useState("all");
+=======
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
 
   const [rescheduleRequests, setRescheduleRequests] = useState([
     {
@@ -45,6 +49,10 @@ const AdminAppointments = () => {
       currentTime: "10:00 AM",
       reason: "Emergency surgery scheduled",
       status: "pending",
+<<<<<<< HEAD
+      initiatedBy: "doctor",
+=======
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
     },
     {
       id: "2",
@@ -54,6 +62,10 @@ const AdminAppointments = () => {
       currentTime: "2:30 PM",
       reason: "Personal emergency",
       status: "pending",
+<<<<<<< HEAD
+      initiatedBy: "patient",
+=======
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
     },
   ]);
 
@@ -69,7 +81,14 @@ const AdminAppointments = () => {
     { doctorName: "James Wilson", patientName: "Robert Lee", date: "Jan 22, 2026", time: "1:00 PM", type: "video", status: "cancelled" },
   ];
 
+<<<<<<< HEAD
+  const pendingRequests = rescheduleRequests.filter((r) => 
+    r.status === "pending" && 
+    (filterType === "all" || r.initiatedBy === filterType)
+  );
+=======
   const pendingRequests = rescheduleRequests.filter((r) => r.status === "pending");
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
 
   const handleAcceptRequest = (requestId) => {
     setRescheduleRequests(
@@ -114,6 +133,31 @@ const AdminAppointments = () => {
   return (
     <DashboardLayout navItems={navItems} userType="admin">
       <div className="space-y-6">
+<<<<<<< HEAD
+        {/* Filter Buttons */}
+        <div className="flex items-center gap-2">
+          <Button 
+            variant={filterType === "all" ? "default" : "outline"} 
+            onClick={() => setFilterType("all")}
+          >
+            All Requests
+          </Button>
+          <Button 
+            variant={filterType === "doctor" ? "default" : "outline"} 
+            onClick={() => setFilterType("doctor")}
+          >
+            Doctor Requests
+          </Button>
+          <Button 
+            variant={filterType === "patient" ? "default" : "outline"} 
+            onClick={() => setFilterType("patient")}
+          >
+            Patient Requests
+          </Button>
+        </div>
+
+=======
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
         {/* Reschedule Requests Section */}
         {pendingRequests.length > 0 && (
           <div className="space-y-4">

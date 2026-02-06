@@ -5,6 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Phone, ShieldCheck, CheckCircle2, Stethoscope } from "lucide-react";
+<<<<<<< HEAD
+import { useTranslation } from "react-i18next";
+=======
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,6 +23,10 @@ const Register = () => {
     confirmPassword: "",
   });
   const navigate = useNavigate();
+<<<<<<< HEAD
+  const { t } = useTranslation();
+=======
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -46,6 +54,18 @@ const Register = () => {
               <Stethoscope className="w-7 h-7 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-2xl text-foreground">
+<<<<<<< HEAD
+              {t("landing.brandName")}
+            </span>
+          </Link>
+          <h1 className="text-2xl font-bold text-foreground">
+            {step === "otp" ? t("auth.verifyPhone") : t("auth.createAccount")}
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            {step === "otp" 
+              ? t("auth.sentCode") 
+              : t("auth.registerSubtitle")}
+=======
               MediCare
             </span>
           </Link>
@@ -56,6 +76,7 @@ const Register = () => {
             {step === "otp" 
               ? "We sent a code to your phone" 
               : "Join thousands of patients managing their health"}
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
           </p>
         </div>
 
@@ -70,7 +91,11 @@ const Register = () => {
                 </div>
                 
                 <p className="text-muted-foreground mb-8">
+<<<<<<< HEAD
+                  {t("auth.enterCode")} <br/>
+=======
                   Enter the 4-digit code sent to <br/>
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
                   <span className="font-medium text-foreground">{formData.phone}</span>
                 </p>
 
@@ -96,7 +121,11 @@ const Register = () => {
                   onClick={handleOtpSubmit}
                   disabled={otp.length !== 4}
                 >
+<<<<<<< HEAD
+                  {t("auth.verifyContinue")}
+=======
                   Verify & Continue
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
 
@@ -104,14 +133,22 @@ const Register = () => {
                   onClick={() => setStep("form")}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
+<<<<<<< HEAD
+                  ← {t("auth.backToDetails")}
+=======
                   ← Back to details
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
                 </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5 animate-fade-in">
                 {/* Full Name */}
                 <div className="space-y-3">
+<<<<<<< HEAD
+                  <Label htmlFor="name">{t("auth.fullName")}</Label>
+=======
                   <Label htmlFor="name">Full Name</Label>
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
                   <div className="relative group">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
@@ -128,7 +165,11 @@ const Register = () => {
 
                 {/* Phone Number */}
                 <div className="space-y-3">
+<<<<<<< HEAD
+                  <Label htmlFor="phone">{t("auth.phoneLabel")}</Label>
+=======
                   <Label htmlFor="phone">Phone Number</Label>
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
                   <div className="relative group">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
@@ -145,13 +186,21 @@ const Register = () => {
 
                 {/* Email (Optional) */}
                 <div className="space-y-3">
+<<<<<<< HEAD
+                  <Label htmlFor="email">{t("auth.emailOptional")}</Label>
+=======
                   <Label htmlFor="email">Email (Optional)</Label>
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
                   <div className="relative group">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
                       id="email"
                       type="email"
+<<<<<<< HEAD
+                      placeholder={t("auth.emailPlaceholder")}
+=======
                       placeholder="name@example.com"
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="pl-12 h-10 input-healthcare"
@@ -162,7 +211,11 @@ const Register = () => {
                 {/* Password Row */}
                 <div className="grid grid-cols-1 gap-5">
                   <div className="space-y-3">
+<<<<<<< HEAD
+                    <Label htmlFor="password">{t("auth.passwordLabel")}</Label>
+=======
                     <Label htmlFor="password">Password</Label>
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
                     <div className="relative group">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input
@@ -185,7 +238,11 @@ const Register = () => {
                   </div>
 
                   <div className="space-y-3">
+<<<<<<< HEAD
+                    <Label htmlFor="confirmPassword">{t("auth.confirmPasswordLabel")}</Label>
+=======
                     <Label htmlFor="confirmPassword">Confirm</Label>
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
                     <div className="relative group">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input
@@ -210,7 +267,11 @@ const Register = () => {
                 
                 {formData.confirmPassword && formData.password !== formData.confirmPassword && (
                   <p className="text-xs text-destructive font-medium animate-pulse">
+<<<<<<< HEAD
+                    {t("auth.passwordMismatch")}
+=======
                     Passwords do not match
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
                   </p>
                 )}
 
@@ -221,7 +282,11 @@ const Register = () => {
                   className="w-full mt-4 group"
                   disabled={!formData.name || !formData.phone || !formData.password || !formData.confirmPassword || formData.password !== formData.confirmPassword}
                 >
+<<<<<<< HEAD
+                  {t("auth.createAccount")}
+=======
                   Create Account
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </form>
@@ -230,9 +295,15 @@ const Register = () => {
 
           <div className="bg-secondary/30 p-4 text-center border-t border-border/50">
             <p className="text-sm text-muted-foreground">
+<<<<<<< HEAD
+              {t("auth.hasAccount")}{" "}
+              <Link to="/login" className="text-primary font-semibold hover:underline">
+                {t("auth.signInLink")}
+=======
               Already have an account?{" "}
               <Link to="/login" className="text-primary font-semibold hover:underline">
                 Sign in
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
               </Link>
             </p>
           </div>
@@ -244,7 +315,11 @@ const Register = () => {
         </div>
          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-muted-foreground/80">
           <ShieldCheck className="w-4 h-4" />
+<<<<<<< HEAD
+          <span>{t("auth.secureConnection")}</span>
+=======
           <span>Secure, encrypted connection</span>
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
         </div>
       </div>
     </div>

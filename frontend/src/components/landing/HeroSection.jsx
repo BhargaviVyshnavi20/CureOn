@@ -29,10 +29,17 @@ const HeroSection = () => {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Content */}
           <div className="text-center lg:text-left">
+<<<<<<< HEAD
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 animate-fade-up">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              {t("landing.hero.trustedBy")}
+            </div>
+=======
             {/* <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 animate-fade-up">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               {t("landing.hero.trustedBy")}
             </div> */}
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
 
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-relaxed mb-6 animate-fade-up delay-100 pb-4">
               {t("landing.hero.headlinePrefix")}
@@ -102,7 +109,11 @@ const HeroSection = () => {
                       className="w-12 h-12 rounded-full object-cover"
                     />
                     <div>
+<<<<<<< HEAD
+                      <p className="font-semibold text-foreground">{t("landing.hero.cards.doctorName")}</p>
+=======
                       {/* <p className="font-semibold text-foreground">{t("landing.hero.cards.doctorName")}</p> */}
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
                       <p className="text-sm text-muted-foreground">{t("landing.hero.cards.onlineNow")}</p>
                     </div>
                   </div>

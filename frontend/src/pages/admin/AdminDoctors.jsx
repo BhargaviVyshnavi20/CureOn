@@ -69,6 +69,10 @@ const AdminDoctors = () => {
   const [addDoctorModalOpen, setAddDoctorModalOpen] = useState(false);
   const [editDoctorModalOpen, setEditDoctorModalOpen] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState(null);
+<<<<<<< HEAD
+  const [searchQuery, setSearchQuery] = useState("");
+=======
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
   const [doctors, setDoctors] = useState([
     { id: "1", name: "Dr. Sarah Johnson", specialty: "General Physician", email: "sarah.j@medicare.com", phone: "+1 (555) 123-4567", status: "active", patients: 248 },
     { id: "2", name: "Dr. Michael Chen", specialty: "Cardiologist", email: "michael.c@medicare.com", phone: "+1 (555) 234-5678", status: "active", patients: 186 },
@@ -124,11 +128,30 @@ const AdminDoctors = () => {
 
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+<<<<<<< HEAD
+          <Input 
+            placeholder="Search doctors..." 
+            className="pl-10" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {doctors
+            .filter((doctor) => 
+              doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              doctor.email.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            .map((doctor) => (
+=======
           <Input placeholder="Search doctors..." className="pl-10" />
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {doctors.map((doctor) => (
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
             <div 
               key={doctor.id} 
               className="dashboard-card relative hover:shadow-lg transition-all group"

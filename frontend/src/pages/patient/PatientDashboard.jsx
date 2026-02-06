@@ -43,8 +43,13 @@ const PatientDashboard = () => {
   
   const upcomingAppointments = [
     {
+<<<<<<< HEAD
+      doctorName: "appointments.doctors.sarahJohnson",
+      specialty: "appointments.specialties.general",
+=======
       doctorName: "Sarah Johnson",
       specialty: t('appointments.specialties.general'),
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
       date: new Date(2026, 0, 25),
       time: "10:00 AM",
       type: "video",
@@ -52,8 +57,13 @@ const PatientDashboard = () => {
       avatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
     },
     {
+<<<<<<< HEAD
+      doctorName: "appointments.doctors.michaelChen",
+      specialty: "appointments.specialties.cardio",
+=======
       doctorName: "Michael Chen",
       specialty: t('appointments.specialties.cardio'),
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
       date: new Date(2026, 0, 28),
       time: "2:30 PM",
       type: "in-person",
@@ -78,7 +88,15 @@ const PatientDashboard = () => {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">
+<<<<<<< HEAD
+              {t('dashboard.welcome', { 
+                name: patientProfile?.name?.split(' ')[0] === 'Alex' 
+                  ? t('dashboard.alex') 
+                  : patientProfile?.name?.split(' ')[0] 
+              })}
+=======
               {t('dashboard.welcome')} {patientProfile?.name?.split(' ')[0]}! 👋
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
             </h1>
             <p className="text-muted-foreground mt-1">
               {t('dashboard.overview')}

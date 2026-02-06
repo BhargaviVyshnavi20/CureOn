@@ -54,43 +54,75 @@ const PatientRecords = () => {
   const doctorRecords = [
     {
       id: "d1",
+<<<<<<< HEAD
+      name: t('records.doctorRecords.bloodTestResults'),
+=======
       name: "Blood Test Results",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
       type: "labReport",
       date: new Date(2026, 0, 15),
       fileType: "pdf",
       size: "245 KB",
       uploadedBy: "doctor",
+<<<<<<< HEAD
+      doctorName: `${t('common.dr')} Sarah Johnson`,
+    },
+    {
+      id: "d2",
+      name: t('records.doctorRecords.chestXRay'),
+=======
       doctorName: "Dr. Sarah Johnson",
     },
     {
       id: "d2",
       name: "Chest X-Ray",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
       type: "imaging",
       date: new Date(2026, 0, 10),
       fileType: "image",
       size: "1.2 MB",
       uploadedBy: "doctor",
+<<<<<<< HEAD
+      doctorName: `${t('common.dr')} Michael Chen`,
+    },
+    {
+      id: "d3",
+      name: t('records.doctorRecords.generalCheckupReport'),
+=======
       doctorName: "Dr. Michael Chen",
     },
     {
       id: "d3",
       name: "General Checkup Report",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
       type: "consultation",
       date: new Date(2025, 11, 20),
       fileType: "pdf",
       size: "156 KB",
       uploadedBy: "doctor",
+<<<<<<< HEAD
+      doctorName: `${t('common.dr')} Sarah Johnson`,
+    },
+    {
+      id: "d4",
+      name: t('records.doctorRecords.mriScanResults'),
+=======
       doctorName: "Dr. Sarah Johnson",
     },
     {
       id: "d4",
       name: "MRI Scan Results",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
       type: "imaging",
       date: new Date(2025, 11, 5),
       fileType: "image",
       size: "3.4 MB",
       uploadedBy: "doctor",
+<<<<<<< HEAD
+      doctorName: `${t('common.dr')} Lisa Anderson`,
+=======
       doctorName: "Dr. Lisa Anderson",
+>>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
     },
   ];
 
