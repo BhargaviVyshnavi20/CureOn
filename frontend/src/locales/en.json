@@ -38,59 +38,8 @@
     "change": "Change",
     "download": "Download"
   },
-<<<<<<< HEAD
-  "auth": {
-    "welcomeBack": "Welcome Back",
-    "signInSubtitle": "Sign in to access your account",
-    "signInAs": "Sign in as",
-    "selectRole": "Select role",
-    "roles": {
-      "patient": "Patient",
-      "doctor": "Doctor",
-      "admin": "Admin",
-      "pharmacy": "Pharmacy",
-      "labs": "Labs"
-    },
-    "emailLabel": "Email Address",
-    "emailPlaceholder": "name@example.com",
-    "passwordLabel": "Password",
-    "passwordPlaceholder": "Enter your password",
-    "forgotPassword": "Forgot password?",
-    "signInBtn": "Sign In as",
-    "noAccount": "Don't have an account?",
-    "createAccount": "Create Account",
-    "secureConnection": "Secure, encrypted connection",
-    "forgotPasswordPage": {
-      "title": "Reset Password",
-      "subtitle": "Enter your email to receive reset instructions",
-      "successSubtitle": "Check your email for instructions",
-      "sendLink": "Send Reset Link",
-      "backToSignIn": "Back to Sign In",
-      "sentMessage": "We have sent a password reset link to <1>{{email}}</1>. Please check your inbox and spam folder.",
-      "tryAnother": "Try another email",
-      "toastSuccess": "Password reset instructions sent to your email"
-    },
-    "registerSubtitle": "Join thousands of patients managing their health",
-    "verifyPhone": "Verify Phone",
-    "sentCode": "We sent a code to your phone",
-    "enterCode": "Enter the 4-digit code sent to",
-    "verifyContinue": "Verify & Continue",
-    "backToDetails": "Back to details",
-    "fullName": "Full Name",
-    "phoneLabel": "Phone Number",
-    "emailOptional": "Email (Optional)",
-    "confirmPasswordLabel": "Confirm",
-    "passwordMismatch": "Passwords do not match",
-    "hasAccount": "Already have an account?",
-    "signInLink": "Sign in"
-  },
-  "dashboard": {
-    "welcome": "Welcome back, {{name}}! 👋",
-    "alex": "Alex",
-=======
   "dashboard": {
     "welcome": "Welcome back,",
->>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
     "overview": "Here's an overview of your health journey",
     "upcomingAppointments": "Upcoming Appointments",
     "completedVisits": "Completed Visits",
@@ -131,19 +80,7 @@
       "pedia": "Pediatrician",
       "pediaDesc": "Child health specialist",
       "derma": "Dermatologist",
-<<<<<<< HEAD
-      "dermaDesc": "Skin care specialist",
-      "availableDoctor": "Available Doctor"
-    },
-    "doctors": {
-      "sarahJohnson": "Sarah Johnson",
-      "michaelChen": "Michael Chen",
-      "emilyWilliams": "Emily Williams",
-      "jamesWilson": "James Wilson",
-      "robertBrown": "Robert Brown"
-=======
       "dermaDesc": "Skin care specialist"
->>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
     },
     "noUpcoming": "No upcoming appointments",
     "bookToStart": "Book an appointment to get started",
@@ -173,15 +110,6 @@
       "imaging": "Imaging",
       "consultation": "Consultation",
       "uploaded": "Uploaded Document"
-<<<<<<< HEAD
-    },
-    "doctorRecords": {
-      "bloodTestResults": "Blood Test Results",
-      "chestXRay": "Chest X-Ray",
-      "generalCheckupReport": "General Checkup Report",
-      "mriScanResults": "MRI Scan Results"
-=======
->>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
     }
   },
   "prescriptions": {
@@ -189,20 +117,7 @@
     "subtitle": "View your prescription history",
     "active": "Active",
     "completed": "Completed",
-<<<<<<< HEAD
-    "download": "Downloading prescription from {{date}}",
-    "dosage": {
-      "tablet": "tablet",
-      "timesDaily": "{{count}} times daily",
-      "onceDaily": "Once daily",
-      "twiceDaily": "Twice daily",
-      "atNight": "At night",
-      "asNeeded": "As needed",
-      "days": "days"
-    }
-=======
     "download": "Downloading prescription from {{date}}"
->>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
   },
   "chatbot": {
     "title": "Health Assistant",
@@ -316,11 +231,7 @@
     }
   },
   "landing": {
-<<<<<<< HEAD
-    "brandName": "CureOn",
-=======
     "brandName": "MediCare",
->>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
     "nav": {
       "home": "Home",
       "services": "Services",
@@ -389,11 +300,7 @@
     "about": {
       "tag": "About Us",
       "title": "Your Complete Healthcare Ecosystem",
-<<<<<<< HEAD
-      "description": "CureOn bridges the gap between patients, doctors, pharmacies, and diagnostic labs. Experience a seamless, integrated healthcare journey where every stakeholder is connected for better care delivery.",
-=======
       "description": "Health Connect Hub bridges the gap between patients, doctors, pharmacies, and diagnostic labs. Experience a seamless, integrated healthcare journey where every stakeholder is connected for better care delivery.",
->>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
       "features": {
         "advancedTechnology": {
           "title": "Seamless Integration",
@@ -411,11 +318,7 @@
     },
     "cta": {
       "title": "Start Your Health Journey Today",
-<<<<<<< HEAD
-      "description": "Join thousands of patients who trust CureOn for their healthcare needs. Get started in minutes and experience healthcare reimagined.",
-=======
       "description": "Join thousands of patients who trust MediCare for their healthcare needs. Get started in minutes and experience healthcare reimagined.",
->>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
       "createAccount": "Create Free Account",
       "talkSupport": "Talk to Support",
       "stats": {
@@ -445,11 +348,7 @@
         "privacyPolicy": "Privacy Policy",
         "termsOfService": "Terms of Service"
       },
-<<<<<<< HEAD
-      "rightsReserved": "CureOn. All rights reserved."
-=======
       "rightsReserved": "MediCare. All rights reserved."
->>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
     }
   }
 }

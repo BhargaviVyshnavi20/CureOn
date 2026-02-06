@@ -8,10 +8,6 @@ import ScrollToHashElement from "@/components/utils/ScrollToHashElement";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-<<<<<<< HEAD
-import ForgotPassword from "./pages/ForgotPassword";
-=======
->>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
 import PatientDashboard from "./pages/patient/PatientDashboard";
 import PatientAppointments from "./pages/patient/PatientAppointments";
 import PatientRecords from "./pages/patient/PatientRecords";
@@ -22,27 +18,14 @@ import PatientProfile from "./pages/patient/PatientProfile";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import DoctorAppointments from "./pages/doctor/DoctorAppointments";
 import DoctorPatients from "./pages/doctor/DoctorPatients";
-<<<<<<< HEAD
-import DoctorPatientDetails from "./pages/doctor/DoctorPatientDetails";
-=======
->>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
 import DoctorAvailability from "./pages/doctor/DoctorAvailability";
 import DoctorSettings from "./pages/doctor/DoctorSettings";
 import DoctorProfile from "./pages/doctor/DoctorProfile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminDoctors from "./pages/admin/AdminDoctors";
 import AdminPatients from "./pages/admin/AdminPatients";
-<<<<<<< HEAD
-import AdminPatientDetails from "./pages/admin/AdminPatientDetails";
-import AdminLabs from "./pages/admin/AdminLabs";
-import AdminLabDetails from "./pages/admin/AdminLabDetails";
-import AdminPharmacy from "./pages/admin/AdminPharmacy";
-import AdminPharmacyInventory from "./pages/admin/AdminPharmacyInventory";
-import AdminPharmacyOrders from "./pages/admin/AdminPharmacyOrders";
-=======
 import AdminPharmacy from "./pages/admin/AdminPharmacy";
 import AdminLabs from "./pages/admin/AdminLabs";
->>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
 import AdminDoctorDetails from "./pages/admin/AdminDoctorDetails";
 import AdminAppointments from "./pages/admin/AdminAppointments";
 import AdminSettings from "./pages/admin/AdminSettings";
@@ -77,10 +60,6 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-<<<<<<< HEAD
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-=======
->>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
           {/* Patient Routes */}
           <Route path="/patient/dashboard" element={<PatientDashboard />} />
           <Route path="/patient/appointments" element={<PatientAppointments />} />
@@ -93,10 +72,6 @@ const App = () => (
           <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
           <Route path="/doctor/appointments" element={<DoctorAppointments />} />
           <Route path="/doctor/patients" element={<DoctorPatients />} />
-<<<<<<< HEAD
-          <Route path="/doctor/patients/:id" element={<DoctorPatientDetails />} />
-=======
->>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
           <Route path="/doctor/availability" element={<DoctorAvailability />} />
           <Route path="/doctor/settings" element={<DoctorSettings />} />
           <Route path="/doctor/profile" element={<DoctorProfile />} />
@@ -104,17 +79,8 @@ const App = () => (
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/doctors" element={<AdminDoctors />} />
           <Route path="/admin/patients" element={<AdminPatients />} />
-<<<<<<< HEAD
-          <Route path="/admin/patients/:id" element={<AdminPatientDetails />} />
-          <Route path="/admin/labs" element={<AdminLabs />} />
-        <Route path="/admin/labs/:id" element={<AdminLabDetails />} />
-        <Route path="/admin/pharmacy" element={<AdminPharmacy />} />
-        <Route path="/admin/pharmacy/inventory" element={<AdminPharmacyInventory />} />
-        <Route path="/admin/pharmacy/orders" element={<AdminPharmacyOrders />} />
-=======
           <Route path="/admin/pharmacy" element={<AdminPharmacy />} />
           <Route path="/admin/labs" element={<AdminLabs />} />
->>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
           <Route path="/admin/doctors/:id" element={<AdminDoctorDetails />} />
           <Route path="/admin/appointments" element={<AdminAppointments />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
