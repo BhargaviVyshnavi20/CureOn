@@ -1,11 +1,16 @@
 import { useState } from "react";
 <<<<<<< HEAD
 import { Link, useNavigate } from "react-router-dom";
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
+=======
+<<<<<<< HEAD
+import { Link, useNavigate } from "react-router-dom";
 =======
 import { Link } from "react-router-dom";
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import AddPatientModal from "@/components/admin/AddPatientModal";
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +22,10 @@ import {
   Mail,
   Phone,
   MoreVertical,
+<<<<<<< HEAD
+=======
   UserPlus,
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
   Pencil,
   Trash2,
   Users,
@@ -59,11 +67,18 @@ const navItems = [
 const AdminPatients = () => {
 <<<<<<< HEAD
   const navigate = useNavigate();
+  const [editPatientModalOpen, setEditPatientModalOpen] = useState(false);
+  const [editingPatient, setEditingPatient] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+=======
+<<<<<<< HEAD
+  const navigate = useNavigate();
 =======
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
   const [addPatientModalOpen, setAddPatientModalOpen] = useState(false);
   const [editPatientModalOpen, setEditPatientModalOpen] = useState(false);
   const [editingPatient, setEditingPatient] = useState(null);
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
   const [patients, setPatients] = useState([
     { id: "1", name: "John Doe", age: 34, gender: "Male", email: "john.d@example.com", phone: "+1 (555) 123-4567", address: "123 Main St, New York", status: "active" },
     { id: "2", name: "Jane Smith", age: 28, gender: "Female", email: "jane.s@example.com", phone: "+1 (555) 234-5678", address: "456 Oak Ave, Los Angeles", status: "active" },
@@ -72,6 +87,8 @@ const AdminPatients = () => {
     { id: "5", name: "Michael Wilson", age: 60, gender: "Male", email: "michael.w@example.com", phone: "+1 (555) 567-8901", address: "654 Maple Dr, Phoenix", status: "active" },
   ]);
 
+<<<<<<< HEAD
+=======
   const handlePatientAdded = (patientData) => {
     const newPatient = {
       id: Date.now().toString(),
@@ -86,6 +103,7 @@ const AdminPatients = () => {
     setPatients((prev) => [...prev, newPatient]);
   };
 
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
   const handleEditClick = (patient) => {
     setEditingPatient(patient);
     setEditPatientModalOpen(true);
@@ -103,6 +121,18 @@ const AdminPatients = () => {
     }
   };
 
+<<<<<<< HEAD
+  const filteredPatients = patients.filter((patient) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      patient.name.toLowerCase().includes(query) ||
+      patient.email.toLowerCase().includes(query) ||
+      patient.phone.includes(query)
+    );
+  });
+
+=======
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
   return (
     <DashboardLayout navItems={navItems} userType="admin">
       <div className="space-y-6">
@@ -111,14 +141,33 @@ const AdminPatients = () => {
             <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">Patients</h1>
             <p className="text-muted-foreground mt-1">Manage registered patients</p>
           </div>
+<<<<<<< HEAD
+=======
           <Button variant="hero" onClick={() => setAddPatientModalOpen(true)}>
             <UserPlus className="w-5 h-5" />
             Add Patient
           </Button>
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
         </div>
 
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+<<<<<<< HEAD
+          <Input 
+            placeholder="Search patients..." 
+            className="pl-10" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredPatients.map((patient) => (
+            <div 
+              key={patient.id} 
+              className="dashboard-card relative hover:shadow-lg transition-all group cursor-pointer"
+              onClick={() => navigate(`/admin/patients/${patient.id}`)}
+=======
           <Input placeholder="Search patients..." className="pl-10" />
         </div>
 
@@ -132,6 +181,7 @@ const AdminPatients = () => {
 =======
               className="dashboard-card relative hover:shadow-lg transition-all group"
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
             >
               <div className="block p-5">
                 <div className="flex items-start justify-between mb-4">
@@ -193,6 +243,8 @@ const AdminPatients = () => {
         </div>
       </div>
 
+<<<<<<< HEAD
+=======
       {/* Add Patient Modal */}
       <AddPatientModal
         open={addPatientModalOpen}
@@ -200,6 +252,7 @@ const AdminPatients = () => {
         onPatientAdded={handlePatientAdded}
       />
 
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
       {/* Edit Patient Modal */}
       <Dialog open={editPatientModalOpen} onOpenChange={setEditPatientModalOpen}>
         <DialogContent className="sm:max-w-lg">

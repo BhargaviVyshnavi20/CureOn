@@ -52,6 +52,9 @@ const Footer = () => {
             </p>
             <div className="space-y-3">
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
               <a href="mailto:support@cureon.com" className="flex items-center gap-3 text-primary-foreground/70 hover:text-primary transition-colors">
                 <Mail className="w-5 h-5" />
                 <span>support@cureon.com</span>
@@ -59,6 +62,8 @@ const Footer = () => {
               <a href="tel:+1-800-CUREON" className="flex items-center gap-3 text-primary-foreground/70 hover:text-primary transition-colors">
                 <Phone className="w-5 h-5" />
                 <span>1-800-CUREON</span>
+<<<<<<< HEAD
+=======
 =======
               <a href="mailto:support@medicare.com" className="flex items-center gap-3 text-primary-foreground/70 hover:text-primary transition-colors">
                 <Mail className="w-5 h-5" />
@@ -68,6 +73,7 @@ const Footer = () => {
                 <Phone className="w-5 h-5" />
                 <span>1-800-MEDICARE</span>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
               </a>
               <div className="flex items-center gap-3 text-primary-foreground/70">
                 <MapPin className="w-5 h-5" />

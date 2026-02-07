@@ -38,13 +38,20 @@ const PatientPrescriptions = () => {
 <<<<<<< HEAD
       prescribedBy: `${t('common.dr')} Sarah Johnson`,
 =======
+<<<<<<< HEAD
+      prescribedBy: `${t('common.dr')} Sarah Johnson`,
+=======
       prescribedBy: "Dr. Sarah Johnson",
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
       status: "Active",
       medicines: [
         {
           name: "Amoxicillin 500mg",
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
           dosage: `1 ${t('prescriptions.dosage.tablet')}`,
           frequency: t('prescriptions.dosage.timesDaily', { count: 3 }),
           duration: `7 ${t('prescriptions.dosage.days')}`,
@@ -54,6 +61,8 @@ const PatientPrescriptions = () => {
           dosage: `1 ${t('prescriptions.dosage.tablet')}`,
           frequency: t('prescriptions.dosage.asNeeded'),
           duration: `5 ${t('prescriptions.dosage.days')}`,
+<<<<<<< HEAD
+=======
 =======
           dosage: "1 tablet",
           frequency: "3 times daily",
@@ -65,6 +74,7 @@ const PatientPrescriptions = () => {
           frequency: "As needed",
           duration: "5 days",
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
         },
       ],
     },
@@ -74,13 +84,20 @@ const PatientPrescriptions = () => {
 <<<<<<< HEAD
       prescribedBy: `${t('common.dr')} Michael Chen`,
 =======
+<<<<<<< HEAD
+      prescribedBy: `${t('common.dr')} Michael Chen`,
+=======
       prescribedBy: "Dr. Michael Chen",
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
       status: "Active",
       medicines: [
         {
           name: "Lisinopril 10mg",
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
           dosage: `1 ${t('prescriptions.dosage.tablet')}`,
           frequency: t('prescriptions.dosage.onceDaily'),
           duration: `30 ${t('prescriptions.dosage.days')}`,
@@ -90,6 +107,8 @@ const PatientPrescriptions = () => {
           dosage: `1 ${t('prescriptions.dosage.tablet')}`,
           frequency: t('prescriptions.dosage.atNight'),
           duration: `30 ${t('prescriptions.dosage.days')}`,
+<<<<<<< HEAD
+=======
 =======
           dosage: "1 tablet",
           frequency: "Once daily",
@@ -101,6 +120,7 @@ const PatientPrescriptions = () => {
           frequency: "At night",
           duration: "30 days",
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
         },
       ],
     },
@@ -110,8 +130,12 @@ const PatientPrescriptions = () => {
 <<<<<<< HEAD
       prescribedBy: `${t('common.dr')} Lisa Anderson`,
 =======
+<<<<<<< HEAD
+      prescribedBy: `${t('common.dr')} Lisa Anderson`,
+=======
       prescribedBy: "Dr. Lisa Anderson",
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
       status: "Active",
       medicines: [
         {
@@ -121,10 +145,16 @@ const PatientPrescriptions = () => {
           frequency: t('prescriptions.dosage.twiceDaily'),
           duration: `30 ${t('prescriptions.dosage.days')}`,
 =======
+<<<<<<< HEAD
+          dosage: `1 ${t('prescriptions.dosage.tablet')}`,
+          frequency: t('prescriptions.dosage.twiceDaily'),
+          duration: `30 ${t('prescriptions.dosage.days')}`,
+=======
           dosage: "1 tablet",
           frequency: "Twice daily",
           duration: "30 days",
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
         },
       ],
     },
@@ -134,8 +164,12 @@ const PatientPrescriptions = () => {
 <<<<<<< HEAD
       prescribedBy: `${t('common.dr')} Sarah Johnson`,
 =======
+<<<<<<< HEAD
+      prescribedBy: `${t('common.dr')} Sarah Johnson`,
+=======
       prescribedBy: "Dr. Sarah Johnson",
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
       status: "Completed",
       medicines: [
         {
@@ -145,10 +179,16 @@ const PatientPrescriptions = () => {
           frequency: t('prescriptions.dosage.onceDaily'),
           duration: `3 ${t('prescriptions.dosage.days')}`,
 =======
+<<<<<<< HEAD
+          dosage: `1 ${t('prescriptions.dosage.tablet')}`,
+          frequency: t('prescriptions.dosage.onceDaily'),
+          duration: `3 ${t('prescriptions.dosage.days')}`,
+=======
           dosage: "1 tablet",
           frequency: "Once daily",
           duration: "3 days",
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
         },
         {
           name: "Cough Syrup",
@@ -157,9 +197,14 @@ const PatientPrescriptions = () => {
           frequency: t('prescriptions.dosage.timesDaily', { count: 3 }),
           duration: `5 ${t('prescriptions.dosage.days')}`,
 =======
+<<<<<<< HEAD
+          frequency: t('prescriptions.dosage.timesDaily', { count: 3 }),
+          duration: `5 ${t('prescriptions.dosage.days')}`,
+=======
           frequency: "3 times daily",
           duration: "5 days",
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
         },
       ],
     },
@@ -169,8 +214,12 @@ const PatientPrescriptions = () => {
 <<<<<<< HEAD
       prescribedBy: `${t('common.dr')} James Wilson`,
 =======
+<<<<<<< HEAD
+      prescribedBy: `${t('common.dr')} James Wilson`,
+=======
       prescribedBy: "Dr. James Wilson",
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
       status: "Completed",
       medicines: [
         {
@@ -180,10 +229,16 @@ const PatientPrescriptions = () => {
           frequency: t('prescriptions.dosage.twiceDaily'),
           duration: `5 ${t('prescriptions.dosage.days')}`,
 =======
+<<<<<<< HEAD
+          dosage: `1 ${t('prescriptions.dosage.tablet')}`,
+          frequency: t('prescriptions.dosage.twiceDaily'),
+          duration: `5 ${t('prescriptions.dosage.days')}`,
+=======
           dosage: "1 tablet",
           frequency: "Twice daily",
           duration: "5 days",
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
         },
       ],
     },

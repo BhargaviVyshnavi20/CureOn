@@ -2,6 +2,21 @@ import { useState } from "react";
 <<<<<<< HEAD
 import { Link, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+=======
+<<<<<<< HEAD
+import { Link, useNavigate } from "react-router-dom";
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
 =======
 import { Link } from "react-router-dom";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
@@ -10,10 +25,15 @@ import AddPharmacyModal from "@/components/admin/AddPharmacyModal";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
   LayoutDashboard,
   Stethoscope,
   Calendar,
   Settings,
+<<<<<<< HEAD
+  Mail,
+  Phone,
+=======
 <<<<<<< HEAD
   Mail,
   Phone,
@@ -26,11 +46,19 @@ import {
   Pencil,
   Trash2,
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
   Users,
   Pill,
   FlaskConical,
   MapPin,
   FileText,
+<<<<<<< HEAD
+  Package,
+  ShoppingCart,
+  Activity,
+  Clock
+} from "lucide-react";
+=======
 <<<<<<< HEAD
   Package,
   ShoppingCart,
@@ -51,6 +79,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
 import { Label } from "@/components/ui/label";
 
 const navItems = [
@@ -65,6 +94,9 @@ const navItems = [
 
 const AdminPharmacy = () => {
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
   const navigate = useNavigate();
   // Single CureOn Pharmacy Data
   const pharmacy = {
@@ -78,6 +110,42 @@ const AdminPharmacy = () => {
     orders: 1250,
     inventoryCount: 4500,
     pendingOrders: 12
+<<<<<<< HEAD
+  };
+
+  const staff = [
+    {
+      id: 1,
+      name: "Sarah Jenkins",
+      role: "Head Pharmacist",
+      contact: "+1 (555) 123-4567",
+      email: "sarah.j@cureon.health",
+      hours: "Mon-Fri: 8AM - 4PM",
+      status: "On Duty"
+    },
+    {
+      id: 2,
+      name: "Michael Chen",
+      role: "Pharmacy Technician",
+      contact: "+1 (555) 987-6543",
+      email: "michael.c@cureon.health",
+      hours: "Mon-Fri: 12PM - 8PM",
+      status: "On Break"
+    },
+    {
+      id: 3,
+      name: "David Wilson",
+      role: "Pharmacist",
+      contact: "+1 (555) 456-7890",
+      email: "david.w@cureon.health",
+      hours: "Sat-Sun: 9AM - 5PM",
+      status: "Off Duty"
+    }
+  ];
+
+  return (
+    <DashboardLayout navItems={navItems} userType="admin">
+=======
 =======
   const [addPharmacyModalOpen, setAddPharmacyModalOpen] = useState(false);
   const [editPharmacyModalOpen, setEditPharmacyModalOpen] = useState(false);
@@ -123,6 +191,7 @@ const AdminPharmacy = () => {
   return (
     <DashboardLayout navItems={navItems} userType="admin">
 <<<<<<< HEAD
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
       <div className="space-y-6 animate-fade-in">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
@@ -231,6 +300,84 @@ const AdminPharmacy = () => {
               </div>
             </div>
           </div>
+<<<<<<< HEAD
+
+          {/* Working Staff Section */}
+          <div className="dashboard-card relative hover:shadow-lg transition-all">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Users className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg text-foreground">Working Staff</h3>
+                    <p className="text-sm text-muted-foreground">Pharmacy staff details and schedule</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-border bg-card/50 overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Staff Member</TableHead>
+                      <TableHead>Contact Info</TableHead>
+                      <TableHead>Schedule</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {staff.map((member) => (
+                      <TableRow key={member.id} className="hover:bg-muted/50 transition-colors">
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-primary font-semibold">
+                              {member.name.charAt(0)}
+                            </div>
+                            <div>
+                              <p className="font-medium text-foreground">{member.name}</p>
+                              <p className="text-xs text-muted-foreground">{member.role}</p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Phone className="w-3.5 h-3.5" />
+                              <span>{member.contact}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Mail className="w-3.5 h-3.5" />
+                              <span className="truncate">{member.email}</span>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Clock className="w-3.5 h-3.5" />
+                            <span>{member.hours}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            member.status === "On Duty" ? "bg-green-100 text-green-700" :
+                            member.status === "On Break" ? "bg-yellow-100 text-yellow-700" :
+                            "bg-gray-100 text-gray-700"
+                          }`}>
+                            {member.status}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+=======
         </div>
       </div>
 =======
@@ -396,6 +543,7 @@ const AdminPharmacy = () => {
         </DialogContent>
       </Dialog>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
     </DashboardLayout>
   );
 };

@@ -47,9 +47,14 @@ const PatientDashboard = () => {
       doctorName: "appointments.doctors.sarahJohnson",
       specialty: "appointments.specialties.general",
 =======
+<<<<<<< HEAD
+      doctorName: "appointments.doctors.sarahJohnson",
+      specialty: "appointments.specialties.general",
+=======
       doctorName: "Sarah Johnson",
       specialty: t('appointments.specialties.general'),
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
       date: new Date(2026, 0, 25),
       time: "10:00 AM",
       type: "video",
@@ -61,9 +66,14 @@ const PatientDashboard = () => {
       doctorName: "appointments.doctors.michaelChen",
       specialty: "appointments.specialties.cardio",
 =======
+<<<<<<< HEAD
+      doctorName: "appointments.doctors.michaelChen",
+      specialty: "appointments.specialties.cardio",
+=======
       doctorName: "Michael Chen",
       specialty: t('appointments.specialties.cardio'),
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
       date: new Date(2026, 0, 28),
       time: "2:30 PM",
       type: "in-person",
@@ -89,14 +99,20 @@ const PatientDashboard = () => {
           <div>
             <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
               {t('dashboard.welcome', { 
                 name: patientProfile?.name?.split(' ')[0] === 'Alex' 
                   ? t('dashboard.alex') 
                   : patientProfile?.name?.split(' ')[0] 
               })}
+<<<<<<< HEAD
+=======
 =======
               {t('dashboard.welcome')} {patientProfile?.name?.split(' ')[0]}! 👋
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
             </h1>
             <p className="text-muted-foreground mt-1">
               {t('dashboard.overview')}

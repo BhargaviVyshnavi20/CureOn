@@ -8,7 +8,11 @@ import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Phone, ShieldCheck, CheckCir
 <<<<<<< HEAD
 import { useTranslation } from "react-i18next";
 =======
+<<<<<<< HEAD
+import { useTranslation } from "react-i18next";
+=======
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,7 +30,11 @@ const Register = () => {
 <<<<<<< HEAD
   const { t } = useTranslation();
 =======
+<<<<<<< HEAD
+  const { t } = useTranslation();
+=======
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -55,6 +63,9 @@ const Register = () => {
             </div>
             <span className="font-display font-bold text-2xl text-foreground">
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
               {t("landing.brandName")}
             </span>
           </Link>
@@ -65,6 +76,8 @@ const Register = () => {
             {step === "otp" 
               ? t("auth.sentCode") 
               : t("auth.registerSubtitle")}
+<<<<<<< HEAD
+=======
 =======
               MediCare
             </span>
@@ -77,6 +90,7 @@ const Register = () => {
               ? "We sent a code to your phone" 
               : "Join thousands of patients managing their health"}
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
           </p>
         </div>
 
@@ -94,8 +108,12 @@ const Register = () => {
 <<<<<<< HEAD
                   {t("auth.enterCode")} <br/>
 =======
+<<<<<<< HEAD
+                  {t("auth.enterCode")} <br/>
+=======
                   Enter the 4-digit code sent to <br/>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                   <span className="font-medium text-foreground">{formData.phone}</span>
                 </p>
 
@@ -124,8 +142,12 @@ const Register = () => {
 <<<<<<< HEAD
                   {t("auth.verifyContinue")}
 =======
+<<<<<<< HEAD
+                  {t("auth.verifyContinue")}
+=======
                   Verify & Continue
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
 
@@ -136,8 +158,12 @@ const Register = () => {
 <<<<<<< HEAD
                   ← {t("auth.backToDetails")}
 =======
+<<<<<<< HEAD
+                  ← {t("auth.backToDetails")}
+=======
                   ← Back to details
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                 </button>
               </div>
             ) : (
@@ -147,8 +173,12 @@ const Register = () => {
 <<<<<<< HEAD
                   <Label htmlFor="name">{t("auth.fullName")}</Label>
 =======
+<<<<<<< HEAD
+                  <Label htmlFor="name">{t("auth.fullName")}</Label>
+=======
                   <Label htmlFor="name">Full Name</Label>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                   <div className="relative group">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
@@ -168,8 +198,12 @@ const Register = () => {
 <<<<<<< HEAD
                   <Label htmlFor="phone">{t("auth.phoneLabel")}</Label>
 =======
+<<<<<<< HEAD
+                  <Label htmlFor="phone">{t("auth.phoneLabel")}</Label>
+=======
                   <Label htmlFor="phone">Phone Number</Label>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                   <div className="relative group">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
@@ -189,8 +223,12 @@ const Register = () => {
 <<<<<<< HEAD
                   <Label htmlFor="email">{t("auth.emailOptional")}</Label>
 =======
+<<<<<<< HEAD
+                  <Label htmlFor="email">{t("auth.emailOptional")}</Label>
+=======
                   <Label htmlFor="email">Email (Optional)</Label>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                   <div className="relative group">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
@@ -199,8 +237,12 @@ const Register = () => {
 <<<<<<< HEAD
                       placeholder={t("auth.emailPlaceholder")}
 =======
+<<<<<<< HEAD
+                      placeholder={t("auth.emailPlaceholder")}
+=======
                       placeholder="name@example.com"
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="pl-12 h-10 input-healthcare"
@@ -214,8 +256,12 @@ const Register = () => {
 <<<<<<< HEAD
                     <Label htmlFor="password">{t("auth.passwordLabel")}</Label>
 =======
+<<<<<<< HEAD
+                    <Label htmlFor="password">{t("auth.passwordLabel")}</Label>
+=======
                     <Label htmlFor="password">Password</Label>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                     <div className="relative group">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input
@@ -241,8 +287,12 @@ const Register = () => {
 <<<<<<< HEAD
                     <Label htmlFor="confirmPassword">{t("auth.confirmPasswordLabel")}</Label>
 =======
+<<<<<<< HEAD
+                    <Label htmlFor="confirmPassword">{t("auth.confirmPasswordLabel")}</Label>
+=======
                     <Label htmlFor="confirmPassword">Confirm</Label>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                     <div className="relative group">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input
@@ -270,8 +320,12 @@ const Register = () => {
 <<<<<<< HEAD
                     {t("auth.passwordMismatch")}
 =======
+<<<<<<< HEAD
+                    {t("auth.passwordMismatch")}
+=======
                     Passwords do not match
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                   </p>
                 )}
 
@@ -285,8 +339,12 @@ const Register = () => {
 <<<<<<< HEAD
                   {t("auth.createAccount")}
 =======
+<<<<<<< HEAD
+                  {t("auth.createAccount")}
+=======
                   Create Account
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </form>
@@ -300,10 +358,16 @@ const Register = () => {
               <Link to="/login" className="text-primary font-semibold hover:underline">
                 {t("auth.signInLink")}
 =======
+<<<<<<< HEAD
+              {t("auth.hasAccount")}{" "}
+              <Link to="/login" className="text-primary font-semibold hover:underline">
+                {t("auth.signInLink")}
+=======
               Already have an account?{" "}
               <Link to="/login" className="text-primary font-semibold hover:underline">
                 Sign in
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
               </Link>
             </p>
           </div>
@@ -318,8 +382,12 @@ const Register = () => {
 <<<<<<< HEAD
           <span>{t("auth.secureConnection")}</span>
 =======
+<<<<<<< HEAD
+          <span>{t("auth.secureConnection")}</span>
+=======
           <span>Secure, encrypted connection</span>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
         </div>
       </div>
     </div>

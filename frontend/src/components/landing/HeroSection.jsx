@@ -30,16 +30,22 @@ const HeroSection = () => {
           {/* Content */}
           <div className="text-center lg:text-left">
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 animate-fade-up">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               {t("landing.hero.trustedBy")}
             </div>
+<<<<<<< HEAD
+=======
 =======
             {/* <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 animate-fade-up">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               {t("landing.hero.trustedBy")}
             </div> */}
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
 
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-relaxed mb-6 animate-fade-up delay-100 pb-4">
               {t("landing.hero.headlinePrefix")}
@@ -112,8 +118,12 @@ const HeroSection = () => {
 <<<<<<< HEAD
                       <p className="font-semibold text-foreground">{t("landing.hero.cards.doctorName")}</p>
 =======
+<<<<<<< HEAD
+                      <p className="font-semibold text-foreground">{t("landing.hero.cards.doctorName")}</p>
+=======
                       {/* <p className="font-semibold text-foreground">{t("landing.hero.cards.doctorName")}</p> */}
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                       <p className="text-sm text-muted-foreground">{t("landing.hero.cards.onlineNow")}</p>
                     </div>
                   </div>

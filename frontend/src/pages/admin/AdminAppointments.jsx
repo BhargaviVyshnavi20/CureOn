@@ -38,7 +38,11 @@ const AdminAppointments = () => {
 <<<<<<< HEAD
   const [filterType, setFilterType] = useState("all");
 =======
+<<<<<<< HEAD
+  const [filterType, setFilterType] = useState("all");
+=======
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
 
   const [rescheduleRequests, setRescheduleRequests] = useState([
     {
@@ -52,7 +56,11 @@ const AdminAppointments = () => {
 <<<<<<< HEAD
       initiatedBy: "doctor",
 =======
+<<<<<<< HEAD
+      initiatedBy: "doctor",
+=======
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
     },
     {
       id: "2",
@@ -65,7 +73,11 @@ const AdminAppointments = () => {
 <<<<<<< HEAD
       initiatedBy: "patient",
 =======
+<<<<<<< HEAD
+      initiatedBy: "patient",
+=======
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
     },
   ]);
 
@@ -82,13 +94,19 @@ const AdminAppointments = () => {
   ];
 
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
   const pendingRequests = rescheduleRequests.filter((r) => 
     r.status === "pending" && 
     (filterType === "all" || r.initiatedBy === filterType)
   );
+<<<<<<< HEAD
+=======
 =======
   const pendingRequests = rescheduleRequests.filter((r) => r.status === "pending");
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
 
   const handleAcceptRequest = (requestId) => {
     setRescheduleRequests(
@@ -134,6 +152,9 @@ const AdminAppointments = () => {
     <DashboardLayout navItems={navItems} userType="admin">
       <div className="space-y-6">
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
         {/* Filter Buttons */}
         <div className="flex items-center gap-2">
           <Button 
@@ -156,8 +177,11 @@ const AdminAppointments = () => {
           </Button>
         </div>
 
+<<<<<<< HEAD
+=======
 =======
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
         {/* Reschedule Requests Section */}
         {pendingRequests.length > 0 && (
           <div className="space-y-4">

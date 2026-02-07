@@ -14,7 +14,11 @@ import { Eye, EyeOff, Mail, Lock, ArrowRight, ShieldCheck, Stethoscope } from "l
 <<<<<<< HEAD
 import { useTranslation } from "react-i18next";
 =======
+<<<<<<< HEAD
+import { useTranslation } from "react-i18next";
+=======
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -25,7 +29,11 @@ const Login = () => {
 <<<<<<< HEAD
   const { t } = useTranslation();
 =======
+<<<<<<< HEAD
+  const { t } = useTranslation();
+=======
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -54,11 +62,16 @@ const Login = () => {
             </div>
             <span className="font-display font-bold text-2xl text-foreground">
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
               {t("landing.brandName")}
             </span>
           </Link>
           <h1 className="text-2xl font-bold text-foreground">{t("auth.welcomeBack")}</h1>
           <p className="text-muted-foreground mt-2">{t("auth.signInSubtitle")}</p>
+<<<<<<< HEAD
+=======
 =======
               MediCare
             </span>
@@ -66,6 +79,7 @@ const Login = () => {
           <h1 className="text-2xl font-bold text-foreground">Welcome Back</h1>
           <p className="text-muted-foreground mt-2">Sign in to access your account</p>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
         </div>
 
         {/* Card */}
@@ -74,6 +88,9 @@ const Login = () => {
             {/* User Type Selection */}
             <div className="mb-6 space-y-2">
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
               <Label>{t("auth.signInAs")}</Label>
               <Select value={userType} onValueChange={setUserType}>
                 <SelectTrigger className="w-full">
@@ -85,6 +102,8 @@ const Login = () => {
                   <SelectItem value="admin">{t("auth.roles.admin")}</SelectItem>
                   <SelectItem value="pharmacy">{t("auth.roles.pharmacy")}</SelectItem>
                   <SelectItem value="labs">{t("auth.roles.labs")}</SelectItem>
+<<<<<<< HEAD
+=======
 =======
               <Label>Sign in as</Label>
               <Select value={userType} onValueChange={setUserType}>
@@ -98,6 +117,7 @@ const Login = () => {
                   <SelectItem value="pharmacy">Pharmacy</SelectItem>
                   <SelectItem value="labs">Labs</SelectItem>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                 </SelectContent>
               </Select>
             </div>
@@ -107,8 +127,12 @@ const Login = () => {
 <<<<<<< HEAD
                 <Label htmlFor="email">{t("auth.emailLabel")}</Label>
 =======
+<<<<<<< HEAD
+                <Label htmlFor="email">{t("auth.emailLabel")}</Label>
+=======
                 <Label htmlFor="email">Email Address</Label>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                 <div className="relative group">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   <Input
@@ -117,8 +141,12 @@ const Login = () => {
 <<<<<<< HEAD
                     placeholder={t("auth.emailPlaceholder")}
 =======
+<<<<<<< HEAD
+                    placeholder={t("auth.emailPlaceholder")}
+=======
                     placeholder="name@example.com"
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-12 h-10 input-healthcare"
@@ -132,8 +160,12 @@ const Login = () => {
 <<<<<<< HEAD
                   <Label htmlFor="password">{t("auth.passwordLabel")}</Label>
 =======
+<<<<<<< HEAD
+                  <Label htmlFor="password">{t("auth.passwordLabel")}</Label>
+=======
                   <Label htmlFor="password">Password</Label>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                   <Link 
                     to="/forgot-password" 
                     className="text-xs font-medium text-primary hover:text-primary-dark hover:underline transition-colors"
@@ -141,8 +173,12 @@ const Login = () => {
 <<<<<<< HEAD
                     {t("auth.forgotPassword")}
 =======
+<<<<<<< HEAD
+                    {t("auth.forgotPassword")}
+=======
                     Forgot password?
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                   </Link>
                 </div>
                 <div className="relative group">
@@ -153,8 +189,12 @@ const Login = () => {
 <<<<<<< HEAD
                     placeholder={t("auth.passwordPlaceholder")}
 =======
+<<<<<<< HEAD
+                    placeholder={t("auth.passwordPlaceholder")}
+=======
                     placeholder="Enter your password"
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-12 pr-10 h-10 input-healthcare"
@@ -174,8 +214,12 @@ const Login = () => {
 <<<<<<< HEAD
                 {t("auth.signInBtn")} <span className="capitalize ml-1">{t(`auth.roles.${userType}`)}</span>
 =======
+<<<<<<< HEAD
+                {t("auth.signInBtn")} <span className="capitalize ml-1">{t(`auth.roles.${userType}`)}</span>
+=======
                 Sign In as <span className="capitalize ml-1">{userType}</span>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </form>
@@ -188,10 +232,16 @@ const Login = () => {
               <Link to="/register" className="text-primary font-semibold hover:underline">
                 {t("auth.createAccount")}
 =======
+<<<<<<< HEAD
+              {t("auth.noAccount")}{" "}
+              <Link to="/register" className="text-primary font-semibold hover:underline">
+                {t("auth.createAccount")}
+=======
               Don't have an account?{" "}
               <Link to="/register" className="text-primary font-semibold hover:underline">
                 Create Account
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
               </Link>
             </p>
           </div>
@@ -203,8 +253,12 @@ const Login = () => {
 <<<<<<< HEAD
           <span>{t("auth.secureConnection")}</span>
 =======
+<<<<<<< HEAD
+          <span>{t("auth.secureConnection")}</span>
+=======
           <span>Secure, encrypted connection</span>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
         </div>
       </div>
     </div>

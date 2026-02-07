@@ -47,16 +47,22 @@ const AppointmentCard = ({
             <div>
               <h4 className="font-semibold text-foreground truncate">
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
                 {userType === "patient" ? `${t('common.dr')} ${t(doctorName)}` : patientName}
               </h4>
               {specialty && (
                 <p className="text-sm text-muted-foreground">{t(specialty)}</p>
+<<<<<<< HEAD
+=======
 =======
                 {userType === "patient" ? `${t('common.dr')} ${doctorName}` : patientName}
               </h4>
               {specialty && (
                 <p className="text-sm text-muted-foreground">{specialty}</p>
 >>>>>>> 3599b65a2cc45bdc1f17c837ebdb978d629db18b
+>>>>>>> 59b8e7775cb7b7208d45d4938b5be65f2fcabc68
               )}
             </div>
             <span className={`badge-status ${statusStyles[status]} capitalize`}>
