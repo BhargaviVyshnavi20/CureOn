@@ -1,0 +1,216 @@
+import { useState, useEffect } from "react";
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import { useUser } from "@/context/UserContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useTranslation } from "react-i18next";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { User, Camera, Save, Activity, FileText, AlertCircle, LayoutDashboard, Calendar, Pill, HeartPulse, Settings } from "lucide-react";
+import { toast } from "sonner";
+
+const PatientProfile = () => {
+  const { t } = useTranslation();
+  const { getUser, updateUser } = useUser();
+  const patientProfile = getUser("patient");
+  
+  const navItems = [
+    { name: t('common.dashboard'), href: "/patient/dashboard", icon: LayoutDashboard },
+    { name: t('common.appointments'), href: "/patient/appointments", icon: Calendar },
+    { name: t('common.myRecords'), href: "/patient/records", icon: FileText },
+    { name: t('common.prescriptions'), href: "/patient/prescriptions", icon: Pill },
+    { name: t('common.aiHealthAssistant'), href: "/patient/chatbot", icon: HeartPulse },
+    { name: t('common.settings'), href: "/patient/settings", icon: Settings },
+  ];
+
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState(patientProfile || {});
+
+  useEffect(() => {
+    if (patientProfile) {
+      setFormData(patientProfile);
+    }
+  }, [patientProfile]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (name, value) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, avatar: reader.result }));
+        toast.success(t('profile.toast.imageUpdated'));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSave = () => {
+    setLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      updateUser("patient", formData);
+      setLoading(false);
+      toast.success(t('profile.success'));
+    }, 1000);
+  };
+
+  const handleCancel = () => {
+    if (patientProfile) {
+      setFormData(patientProfile);
+      toast.info(t('profile.toast.changesDiscarded'));
+    }
+  };
+
+  return (
+    <DashboardLayout navItems={navItems} userType="patient">
+      <div className="space-y-6 max-w-4xl mx-auto">
+        <div>
+          <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">{t('profile.title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('profile.subtitle')}</p>
+        </div>
+
+        {/* Profile Header & Image */}
+        <div className="dashboard-card p-6 flex flex-col sm:flex-row items-center gap-6">
+          <div className="relative group">
+            <div className="w-32 h-32 rounded-full bg-secondary flex items-center justify-center overflow-hidden border-4 border-background shadow-xl">
+              {formData.avatar ? (
+                <img src={formData.avatar} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-16 h-16 text-muted-foreground" />
+              )}
+            </div>
+            <label className="absolute bottom-0 right-0 p-2 bg-primary text-primary-foreground rounded-full cursor-pointer hover:bg-primary/90 transition-colors shadow-lg">
+              <Camera className="w-5 h-5" />
+              <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+            </label>
+          </div>
+          <div className="text-center sm:text-left space-y-2 flex-1">
+            <h2 className="text-2xl font-bold">{formData.name}</h2>
+            <p className="text-muted-foreground">{t('profile.patientId')}: {formData.patientId}</p>
+            <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">{t('profile.status.active')}</span>
+              <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">{t('profile.status.premium')}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Personal Information */}
+        <div className="dashboard-card p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <User className="w-5 h-5 text-primary" />
+            <h2 className="font-display text-lg font-semibold text-foreground">{t('profile.personalInfo')}</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>{t('profile.labels.fullName')}</Label>
+              <Input name="name" value={formData.name || ''} onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label>{t('profile.labels.email')}</Label>
+              <Input name="email" value={formData.email || ''} onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label>{t('profile.labels.phone')}</Label>
+              <Input name="phone" value={formData.phone || ''} onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label>{t('profile.labels.dob')}</Label>
+              <Input type="date" name="dob" value={formData.dob || ''} onChange={handleChange} />
+            </div>
+            <div className="col-span-full space-y-2">
+              <Label>{t('profile.labels.address')}</Label>
+              <Textarea name="address" value={formData.address || ''} onChange={handleChange} />
+            </div>
+          </div>
+        </div>
+
+        {/* Medical Information */}
+        <div className="dashboard-card p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <Activity className="w-5 h-5 text-primary" />
+            <h2 className="font-display text-lg font-semibold text-foreground">{t('profile.medicalDetails')}</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label>{t('profile.labels.bloodType')}</Label>
+              <Select value={formData.bloodType || ''} onValueChange={(value) => handleSelectChange("bloodType", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('profile.placeholders.bloodType')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="a+">A+</SelectItem>
+                  <SelectItem value="a-">A-</SelectItem>
+                  <SelectItem value="b+">B+</SelectItem>
+                  <SelectItem value="b-">B-</SelectItem>
+                  <SelectItem value="ab+">AB+</SelectItem>
+                  <SelectItem value="ab-">AB-</SelectItem>
+                  <SelectItem value="o+">O+</SelectItem>
+                  <SelectItem value="o-">O-</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>{t('profile.labels.height')}</Label>
+              <Input type="number" name="height" value={formData.height || ''} onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label>{t('profile.labels.weight')}</Label>
+              <Input type="number" name="weight" value={formData.weight || ''} onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label>{t('profile.labels.allergies')}</Label>
+              <Input name="allergies" value={formData.allergies || ''} onChange={handleChange} />
+            </div>
+            <div className="col-span-full space-y-2">
+              <Label>{t('profile.labels.chronic')}</Label>
+              <Textarea name="chronicDiseases" placeholder={t('profile.placeholders.chronic')} value={formData.chronicDiseases || ''} onChange={handleChange} />
+            </div>
+            <div className="col-span-full space-y-2">
+              <Label>{t('profile.labels.past')}</Label>
+              <Textarea name="pastDiseases" placeholder={t('profile.placeholders.past')} value={formData.pastDiseases || ''} onChange={handleChange} />
+            </div>
+            <div className="col-span-full space-y-2">
+              <Label>{t('profile.labels.family')}</Label>
+              <Textarea name="familyHistory" placeholder={t('profile.placeholders.family')} value={formData.familyHistory || ''} onChange={handleChange} />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-4">
+          <Button variant="outline" onClick={handleCancel}>{t('common.cancel')}</Button>
+          <Button onClick={handleSave} disabled={loading}>
+            {loading ? (
+              <>
+                <Save className="w-4 h-4 mr-2 animate-spin" />
+                {t('profile.saving')}
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                {t('common.save')}
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+};
+
+export default PatientProfile;
