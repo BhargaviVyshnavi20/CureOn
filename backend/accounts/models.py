@@ -56,3 +56,27 @@ class LabProfile(models.Model):
     license_number = models.CharField(max_length=100, null=True, blank=True)
     phone = models.CharField(max_length=50, null=True, blank=True)
     address = models.CharField(max_length=255, null=True, blank=True)
+
+class Notification(models.Model):
+    class Type(models.TextChoices):
+        APPOINTMENT_BOOKED = "APPOINTMENT_BOOKED", "AppointmentBooked"
+        APPOINTMENT_STATUS = "APPOINTMENT_STATUS", "AppointmentStatus"
+        RESCHEDULE_REQUEST = "RESCHEDULE_REQUEST", "RescheduleRequest"
+        PRESCRIPTION_CREATED = "PRESCRIPTION_CREATED", "PrescriptionCreated"
+        PHARMACY_STATUS = "PHARMACY_STATUS", "PharmacyStatus"
+        LAB_REQUEST_CREATED = "LAB_REQUEST_CREATED", "LabRequestCreated"
+        LAB_STATUS = "LAB_STATUS", "LabStatus"
+        LAB_RESULT_READY = "LAB_RESULT_READY", "LabResultReady"
+        MESSAGE = "MESSAGE", "Message"
+
+    recipient = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="notifications")
+    sender = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="sent_notifications")
+    type = models.CharField(max_length=40, choices=Type.choices)
+    title = models.CharField(max_length=200)
+    message = models.TextField(blank=True)
+    data = models.JSONField(null=True, blank=True)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]

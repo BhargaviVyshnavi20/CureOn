@@ -19,6 +19,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
     diagnosis = serializers.SerializerMethodField()
     doctor_avatar = serializers.SerializerMethodField()
     patient_avatar = serializers.SerializerMethodField()
+    payment_status = serializers.SerializerMethodField()
     class Meta:
         model = Appointment
         fields = [
@@ -29,6 +30,9 @@ class AppointmentSerializer(serializers.ModelSerializer):
             "time_slot",
             "status",
             "visit_type",
+            "video_url",
+            "is_paid",
+            "payment_status",
             "requested_date",
             "requested_time_slot",
             "created_at",
@@ -87,6 +91,10 @@ class AppointmentSerializer(serializers.ModelSerializer):
     def get_diagnosis(self, obj):
         presc = getattr(obj, "prescription", None)
         return getattr(presc, "diagnosis", None)
+
+    def get_payment_status(self, obj):
+        latest_payment = obj.payments.first()
+        return latest_payment.status if latest_payment else None
 
 class PrescriptionItemSerializer(serializers.ModelSerializer):
     class Meta:

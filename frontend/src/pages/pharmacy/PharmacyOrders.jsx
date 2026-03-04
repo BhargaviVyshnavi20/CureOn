@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,13 +14,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import {
   LayoutDashboard,
   ClipboardList,
@@ -44,7 +46,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { pharmacyService } from "@/services/api";
+import { pharmacyService, appointmentsService } from "@/services/api";
 
 const formatINR = (value) => {
   try {
@@ -67,20 +69,21 @@ const PharmacyOrders = () => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [isNewOrderOpen, setIsNewOrderOpen] = useState(false);
   const [newOrder, setNewOrder] = useState({
-    patientName: "",
-    doctorName: "",
-    medication: "",
-    quantity: "",
-    price: ""
+    patient: null,
+    items: [{ query: "", inventory: null, name: "", unit_price: 0, quantity: "" }],
   });
+  const [picker, setPicker] = useState({ openIndex: null, query: "", results: [], loading: false });
+  const debounceRef = useRef(null);
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
-  const [billingOpen, setBillingOpen] = useState(false);
-  const [billingOrder, setBillingOrder] = useState(null);
-  const [billingItems, setBillingItems] = useState([]);
-  const [billingAttachment, setBillingAttachment] = useState(null);
+  const [printing, setPrinting] = useState(false);
+  const [isViewBillOpen, setIsViewBillOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const uploadInputRef = useRef(null);
+  const [orderForUpload, setOrderForUpload] = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -100,7 +103,13 @@ const PharmacyOrders = () => {
             id: m.id,
             name: m.name,
             quantity: m.quantity || 0,
-            price: m.unit_price != null ? formatINR(m.unit_price) : ''
+            price: (() => {
+              const amt = m.amount != null ? Number(m.amount) : null;
+              if (amt != null && !Number.isNaN(amt)) return formatINR(amt);
+              const up = Number(m.unit_price || 0);
+              const q = Number(m.quantity || 0);
+              return formatINR(up * q);
+            })()
           })),
           total: o.total_amount != null ? formatINR(o.total_amount) : ''
         }));
@@ -143,7 +152,13 @@ const PharmacyOrders = () => {
           id: m.id,
           name: m.name,
           quantity: m.quantity || 0,
-          price: m.unit_price != null ? formatINR(m.unit_price) : ''
+          price: (() => {
+            const amt = m.amount != null ? Number(m.amount) : null;
+            if (amt != null && !Number.isNaN(amt)) return formatINR(amt);
+            const up = Number(m.unit_price || 0);
+            const q = Number(m.quantity || 0);
+            return formatINR(up * q);
+          })()
         })),
         total: o.total_amount != null ? formatINR(o.total_amount) : ''
       }));
@@ -168,49 +183,70 @@ const PharmacyOrders = () => {
     toast.success(`Order ${orderId} status updated to ${newStatus}`);
   };
 
-  const handleCreateOrder = () => {
-    const qty = Number(String(newOrder.quantity).replace(/[^0-9]/g, "")) || 0;
-    const unitPrice = Number(newOrder.price) || 0;
-    if (!newOrder.patientName || !newOrder.medication || qty <= 0 || unitPrice <= 0) {
-      toast.error("Enter patient, medication, quantity (>0), and unit price (>0)");
+  const handleCreateOrder = async () => {
+    const valid = (newOrder.items || []).filter(it => it.inventory && (Number(String(it.quantity).replace(/[^0-9]/g, "")) || 0) > 0);
+    if (!newOrder.patientName || valid.length === 0) {
+      toast.error("Enter patient and add at least one medication with quantity");
       return;
     }
-    const newId = `local-${Date.now()}`;
-    const currentDate = new Date();
-    const order = {
-      id: newId,
-      displayId: `ORD-${String(orders.length + 1).padStart(3, '0')}`,
-      patientName: newOrder.patientName,
-      doctorName: newOrder.doctorName,
-      date: currentDate.toISOString().split('T')[0],
-      time: currentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      status: "Pending",
-      items: [
-        { 
-          name: newOrder.medication, 
-          quantity: qty, 
-          price: formatINR(unitPrice) 
-        }
-      ],
-      total: formatINR(qty * unitPrice)
-    };
-
-    setOrders([order, ...orders]);
-    setIsNewOrderOpen(false);
-    setNewOrder({
-      patientName: "",
-      doctorName: "",
-      medication: "",
-      quantity: "",
-      price: ""
-    });
-    toast.success("New order created successfully");
+    try {
+      const payload = {
+        patient_name: newOrder.patientName,
+        items: valid.map(it => ({
+          inventory_id: it.inventory.id,
+          quantity: Number(String(it.quantity).replace(/[^0-9]/g, "")) || 0,
+        })),
+      };
+      const created = await pharmacyService.orders.createManual(payload);
+      const mapped = {
+        id: created.id,
+        displayId: created.order_id,
+        prescription_id: created.prescription_id,
+        patientName: created.patient_name,
+        doctorName: "",
+        date: new Date(created.created_at).toISOString().split('T')[0],
+        time: new Date(created.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        status: created.status.charAt(0) + created.status.slice(1).toLowerCase(),
+        items: (created.items || []).map(m => ({
+          id: m.id,
+          name: m.name,
+          quantity: m.quantity || 0,
+          price: (() => {
+            const amt = m.amount != null ? Number(m.amount) : null;
+            if (amt != null && !Number.isNaN(amt)) return formatINR(amt);
+            const up = Number(m.unit_price || 0);
+            const q = Number(m.quantity || 0);
+            return formatINR(up * q);
+          })()
+        })),
+        total: created.total_amount != null ? formatINR(created.total_amount) : '',
+      };
+      setOrders(prev => [mapped, ...prev]);
+      setIsNewOrderOpen(false);
+      setNewOrder({ patientName: "", items: [{ query: "", inventory: null, name: "", unit_price: 0, quantity: "" }] });
+      toast.success("Order created");
+    } catch (e) {
+      const msg = e?.response?.data?.detail || e?.message || "Failed to create order";
+      toast.error(msg);
+    }
   };
 
-  const handlePrint = () => {
-    toast.success("Printing order list...");
-    // In a real app, this would trigger window.print() or generate a PDF
-  };
+  useEffect(() => {
+    if (picker.openIndex == null) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await pharmacyService.inventory.list({ search: picker.query });
+        setPicker(p => ({ ...p, results: res || [] }));
+      } catch {
+        setPicker(p => ({ ...p, results: [] }));
+      }
+    }, 200);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [picker.openIndex, picker.query]);
+
+  
+
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -236,6 +272,7 @@ const PharmacyOrders = () => {
   }), [orders, searchTerm, statusFilter]);
 
   return (
+    <>
     <DashboardLayout navItems={navItems} userType="pharmacy">
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -259,7 +296,7 @@ const PharmacyOrders = () => {
                   New Order
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
+              <DialogContent className="sm:max-w-[560px]">
                 <DialogHeader>
                   <DialogTitle>Create New Order</DialogTitle>
                   <DialogDescription>
@@ -268,9 +305,7 @@ const PharmacyOrders = () => {
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="patient" className="text-right">
-                      Patient
-                    </Label>
+                    <Label htmlFor="patient" className="text-right">Patient</Label>
                     <Input
                       id="patient"
                       value={newOrder.patientName}
@@ -279,54 +314,94 @@ const PharmacyOrders = () => {
                       placeholder="Patient Name"
                     />
                   </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="doctor" className="text-right">
-                      Doctor
-                    </Label>
-                    <Input
-                      id="doctor"
-                      value={newOrder.doctorName}
-                      onChange={(e) => setNewOrder({...newOrder, doctorName: e.target.value})}
-                      className="col-span-3"
-                      placeholder="Dr. Name"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="medication" className="text-right">
-                      Medication
-                    </Label>
-                    <Input
-                      id="medication"
-                      value={newOrder.medication}
-                      onChange={(e) => setNewOrder({...newOrder, medication: e.target.value})}
-                      className="col-span-3"
-                      placeholder="Medication Name"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="quantity" className="text-right">
-                      Quantity
-                    </Label>
-                    <Input
-                      id="quantity"
-                      value={newOrder.quantity}
-                      onChange={(e) => setNewOrder({...newOrder, quantity: e.target.value})}
-                      className="col-span-3"
-                      placeholder="e.g. 10 tabs"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="price" className="text-right">
-                      Price ($)
-                    </Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      value={newOrder.price}
-                      onChange={(e) => setNewOrder({...newOrder, price: e.target.value})}
-                      className="col-span-3"
-                      placeholder="0.00"
-                    />
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">Medications</span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setNewOrder(o => ({ ...o, items: [...o.items, { query: "", inventory: null, name: "", unit_price: 0, quantity: "" }] }))}
+                      >
+                        + Add Medication
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      {newOrder.items.map((it, idx) => (
+                        <div key={idx} className="grid grid-cols-12 gap-2 items-end bg-muted/30 p-3 rounded-lg">
+                          <div className="col-span-6">
+                            <Label className="text-xs">Medication</Label>
+                            <Popover open={picker.openIndex === idx} onOpenChange={(o) => setPicker(p => ({ ...p, openIndex: o ? idx : null, query: it.query || "" }))}>
+                              <PopoverTrigger asChild>
+                                <Input
+                                  placeholder="Search medicine"
+                                  readOnly={false}
+                                  value={it.query || it.name || ""}
+                                  onChange={(e) => {
+                                    const q = e.target.value;
+                                    setNewOrder(o => {
+                                      const items = [...o.items];
+                                      items[idx] = { ...items[idx], query: q };
+                                      return { ...o, items };
+                                    });
+                                    setPicker(p => ({ ...p, openIndex: idx, query: q }));
+                                  }}
+                                  onFocus={() => setPicker(p => ({ ...p, openIndex: idx, query: it.query || "" }))}
+                                />
+                              </PopoverTrigger>
+                              <PopoverContent className="p-0 w-[320px]" align="start">
+                                <Command>
+                                  <CommandInput placeholder="Type to search..." value={picker.query} onValueChange={(v) => setPicker(p => ({ ...p, query: v }))} />
+                                  <CommandList>
+                                    <CommandEmpty>No items</CommandEmpty>
+                                    <CommandGroup>
+                                      {(picker.results || []).map((r) => (
+                                        <CommandItem
+                                          key={r.id}
+                                          value={r.name}
+                                          onSelect={() => {
+                                            setNewOrder(o => {
+                                              const items = [...o.items];
+                                              items[idx] = { ...items[idx], inventory: r, name: r.name, unit_price: r.price, query: r.name };
+                                              return { ...o, items };
+                                            });
+                                            setPicker(p => ({ ...p, openIndex: null, query: "" }));
+                                          }}
+                                        >
+                                          <div className="flex justify-between w-full">
+                                            <span>{r.name}</span>
+                                            <span className="text-xs text-muted-foreground">{formatINR(r.price)}</span>
+                                          </div>
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                          <div className="col-span-3">
+                            <Label className="text-xs">Quantity</Label>
+                            <Input
+                              value={it.quantity}
+                              onChange={(e) => {
+                                const v = e.target.value;
+                                setNewOrder(o => {
+                                  const items = [...o.items];
+                                  items[idx] = { ...items[idx], quantity: v };
+                                  return { ...o, items };
+                                });
+                              }}
+                              placeholder="e.g. 10"
+                            />
+                          </div>
+                          <div className="col-span-3">
+                            <Label className="text-xs">Price</Label>
+                            <Input value={formatINR(it.unit_price)} readOnly />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <DialogFooter>
@@ -411,23 +486,9 @@ const PharmacyOrders = () => {
 
                   {/* Actions */}
                   <div className="flex items-center gap-2 self-end lg:self-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <FileText className="w-4 h-4 mr-2" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Printer className="w-4 h-4 mr-2" />
-                          Print Label
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button variant="ghost" size="sm" onClick={() => { setSelectedOrder(order); setIsViewBillOpen(true); }}>
+                      <FileText className="w-4 h-4" />
+                    </Button>
                     {order.status === "Pending" && Number.isInteger(order.id) && (
                       <Button size="sm" variant="hero" onClick={async () => {
                         try {
@@ -464,16 +525,10 @@ const PharmacyOrders = () => {
                       </Button>
                     )}
                     {Number.isInteger(order.id) && <Button size="sm" variant="outline" onClick={() => {
-                      setBillingOrder(order);
-                      setBillingItems(order.items.map((it) => ({
-                        id: it.id,
-                        name: it.name,
-                        quantity: Number(it.quantity) || 0,
-                        unit_price: it.price ? Number(String(it.price).replace(/[^0-9.]/g, "")) : 0
-                      })));
-                      setBillingOpen(true);
-                    }}>
-                      Add Bill
+                      setOrderForUpload(order);
+                      if (uploadInputRef.current) uploadInputRef.current.click();
+                    }} disabled={uploading}>
+                      Upload Bill
                     </Button>}
                   </div>
                 </div>
@@ -494,82 +549,122 @@ const PharmacyOrders = () => {
           )}
         </div>
       </div>
-      {/* Billing Dialog */}
-      <Dialog open={billingOpen} onOpenChange={setBillingOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+      {/* Removed Billing Dialog in favor of direct bill printing */}
+    </DashboardLayout>
+      {/* View Bill Dialog */}
+      <Dialog open={isViewBillOpen} onOpenChange={setIsViewBillOpen}>
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Add Bill</DialogTitle>
+            <DialogTitle>Order Bill</DialogTitle>
             <DialogDescription>
-              Set quantity and unit price for each medicine
+              View complete information for order {selectedOrder?.displayId || `ORD-${String(selectedOrder?.id || "").padStart(4,"0")}`}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3">
-            {billingItems.map((bi, i) => (
-              <div key={i} className="grid grid-cols-12 gap-3 items-end">
-                <div className="col-span-6">
-                  <Label>Item</Label>
-                  <Input value={bi.name} readOnly />
-                </div>
-                <div className="col-span-3">
-                  <Label>Quantity</Label>
-                  <Input
-                    type="number"
-                    value={bi.quantity}
-                    onChange={(e) => {
-                      const v = Number(e.target.value);
-                      setBillingItems(prev => prev.map((x, idx) => idx === i ? { ...x, quantity: v } : x));
-                    }}
-                  />
-                </div>
-                <div className="col-span-3">
-                  <Label>Unit Price</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={bi.unit_price}
-                    onChange={(e) => {
-                      const v = Number(e.target.value);
-                      setBillingItems(prev => prev.map((x, idx) => idx === i ? { ...x, unit_price: v } : x));
-                    }}
-                  />
-                </div>
+          {selectedOrder && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-semibold text-right">Date:</span>
+                <span className="col-span-3">{selectedOrder.date} {selectedOrder.time}</span>
               </div>
-            ))}
-            <div className="flex justify-between border-t pt-3 mt-2">
-              <span className="font-semibold">Total</span>
-              <span className="font-semibold">
-                {formatINR(billingItems.reduce((sum, x) => sum + (Number(x.quantity) * Number(x.unit_price)), 0))}
-              </span>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-semibold text-right">Patient:</span>
+                <span className="col-span-3">{selectedOrder.patientName}</span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-semibold text-right">Items:</span>
+                <span className="col-span-3">
+                  <div className="space-y-1">
+                    {selectedOrder.items.map((it, idx) => (
+                      <div key={idx} className="flex justify-between text-sm">
+                        <span className="font-medium">{it.name}</span>
+                        <div className="flex gap-4 text-muted-foreground">
+                          <span>{it.quantity ? `${it.quantity} qty` : ""}</span>
+                          <span>{it.price}</span>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="border-t border-border pt-2 mt-2 flex justify-between font-bold text-sm">
+                      <span>Total</span>
+                      <span>{selectedOrder.total}</span>
+                    </div>
+                  </div>
+                </span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-semibold text-right">Status:</span>
+                <span className="col-span-3">{selectedOrder.status}</span>
+              </div>
             </div>
-            {/* Removed attachment upload; we will generate bill PDF */}
-          </div>
+          )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setBillingOpen(false)}>Cancel</Button>
-            <Button variant="hero" onClick={async () => {
-              if (!billingOrder) return;
-              try {
-                const payload = billingItems.map(x => ({ id: x.id, name: x.name, quantity: x.quantity, unit_price: x.unit_price }));
-                await appointmentsService.prescriptions.updatePharmacyBill(billingOrder.prescription_id, payload, null);
-                const blob = await pharmacyService.orders.bill(billingOrder.id);
-                const url = window.URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
-                const link = document.createElement("a");
-                link.href = url;
-                link.setAttribute("download", `bill_${billingOrder.displayId || billingOrder.id}.pdf`);
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-                toast.success("Bill generated");
-                setBillingOpen(false);
-              } catch {
-                toast.error("Failed to update bill");
-              }
-            }}>
-              Generate Bill
-            </Button>
+            <Button variant="outline" onClick={() => setIsViewBillOpen(false)}>Close</Button>
+            {selectedOrder && Number.isInteger(selectedOrder.id) && (
+              <Button onClick={async () => {
+                  try {
+                    const blob = await pharmacyService.orders.receipt(selectedOrder.id);
+                    const url = window.URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.setAttribute("download", `bill_${selectedOrder.displayId || selectedOrder.id}.pdf`);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setIsViewBillOpen(false);
+                  } catch {
+                    toast.error("Failed to generate bill");
+                  }
+              }}>
+                Print Bill
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </DashboardLayout>
+      <input
+        ref={uploadInputRef}
+        type="file"
+        accept="application/pdf,image/*"
+        style={{ display: "none" }}
+        onChange={async (e) => {
+          const file = e.target.files?.[0];
+          e.target.value = "";
+          if (!file || !orderForUpload) return;
+          setUploading(true);
+          try {
+            // Fetch prescription items to get correct IDs
+            const prescs = await appointmentsService.prescriptions.listPharmacy();
+            const presc = (prescs || []).find(p => p.id === orderForUpload.prescription_id);
+            const nameToId = {};
+            (presc?.items || []).forEach(pi => { nameToId[String(pi.name).toLowerCase()] = pi.id; });
+            const itemsPayload = (orderForUpload.items || []).map((it) => {
+              const pid = nameToId[String(it.name).toLowerCase()];
+              return {
+                id: pid,
+                quantity: Number(it.quantity) || 0,
+                unit_price: it.price ? Number(String(it.price).replace(/[^0-9.]/g, "")) : 0,
+              };
+            }).filter(x => x.id != null);
+            const updated = await appointmentsService.prescriptions.updatePharmacyBill(orderForUpload.prescription_id, itemsPayload, file);
+            setOrders(prev => prev.map(o => o.id === orderForUpload.id ? {
+              ...o,
+              items: (updated.items || []).map(m => ({
+                id: m.id,
+                name: m.name || m.item_name,
+                quantity: m.quantity,
+                price: formatINR(m.unit_price),
+              })),
+              total: formatINR(updated.total_amount || 0),
+            } : o));
+            toast.success("Bill uploaded");
+          } catch {
+            toast.error("Failed to upload bill");
+          } finally {
+            setUploading(false);
+            setOrderForUpload(null);
+          }
+        }}
+      />
+    </>
   );
 };
 

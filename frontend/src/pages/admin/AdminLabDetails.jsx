@@ -32,7 +32,7 @@ const navItems = [
   { name: "Patients", href: "/admin/patients", icon: Users },
   { name: "Pharmacy", href: "/admin/pharmacy", icon: Pill },
   { name: "Labs", href: "/admin/labs", icon: FlaskConical },
-  { name: "Appointments", href: "/admin/appointments", icon: Calendar },
+  { name: "Payments", href: "/admin/payments", icon: Calendar },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
@@ -171,3 +171,5 @@ const AdminLabDetails = () => {
 };
 
 export default AdminLabDetails;
+
+

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useUser } from "@/context/UserContext";
@@ -22,6 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { notificationsService } from "@/services/api";
 
 const DashboardLayout = ({
   children,
@@ -35,6 +36,65 @@ const DashboardLayout = ({
   const navigate = useNavigate();
   const { user, logout } = useUser();
   const { t } = useTranslation();
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifs, setNotifs] = useState([]);
+  const [unread, setUnread] = useState(0);
+  const loadUnread = async () => {
+    try {
+      const c = await notificationsService.unreadCount();
+      setUnread(c);
+    } catch (e) {}
+  };
+  const loadList = async () => {
+    try {
+      const data = await notificationsService.list({ limit: 10 });
+      setNotifs(data);
+      loadUnread();
+    } catch (e) {}
+  };
+  const getTargetPath = (n) => {
+    const t = n.type;
+    const data = n.data || {};
+    if (userType === "doctor") {
+      if (t === "APPOINTMENT_BOOKED" || t === "APPOINTMENT_STATUS" || t === "RESCHEDULE_REQUEST") return "/doctor/appointments";
+      if (t === "LAB_STATUS" || t === "LAB_RESULT_READY") return "/doctor/patients";
+      if (t === "PRESCRIPTION_CREATED") return "/doctor/appointments";
+      return "/doctor/dashboard";
+    }
+    if (userType === "patient") {
+      if (t === "APPOINTMENT_STATUS") return "/patient/appointments";
+      if (t === "PRESCRIPTION_CREATED" || t === "PHARMACY_STATUS") return "/patient/prescriptions";
+      if (t === "LAB_REQUEST_CREATED" || t === "LAB_STATUS" || t === "LAB_RESULT_READY") return "/patient/records";
+      return "/patient/dashboard";
+    }
+    if (userType === "pharmacy") {
+      if (t === "PHARMACY_STATUS" || t === "PRESCRIPTION_CREATED") return "/pharmacy/orders";
+      return "/pharmacy/dashboard";
+    }
+    if (userType === "labs") {
+      if (t === "LAB_REQUEST_CREATED" || t === "LAB_STATUS") return "/labs/requests";
+      if (t === "LAB_RESULT_READY") return "/labs/results";
+      return "/labs/dashboard";
+    }
+    if (userType === "admin") {
+      return "/admin/dashboard";
+    }
+    return "/";
+  };
+  const handleOpenNotification = async (n) => {
+    try {
+      if (!n.is_read) {
+        await notificationsService.markRead(n.id);
+      }
+    } catch (e) {}
+    const target = getTargetPath(n);
+    navigate(target);
+    setNotifOpen(false);
+    loadUnread();
+  };
+  useEffect(() => {
+    loadUnread();
+  }, []);
   
   const userName = user?.username || propUserName || "User";
   const buildAvatarUrl = (path) => {
@@ -133,11 +193,61 @@ const DashboardLayout = ({
             {/* Language Selector - Only for Patients */}
             {userType === 'patient' && <LanguageSelector />}
 
-            {/* Notifications */}
-            <button className="relative p-2 rounded-lg hover:bg-secondary transition-colors">
-              <Bell className="w-5 h-5 text-muted-foreground" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full" />
-            </button>
+            <DropdownMenu open={notifOpen} onOpenChange={(o)=>{setNotifOpen(o); if(o) loadList();}}>
+              <DropdownMenuTrigger asChild>
+                <button className="relative p-2 rounded-lg hover:bg-secondary transition-colors">
+                  <Bell className="w-5 h-5 text-muted-foreground" />
+                  {unread > 0 && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full" />}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-80 p-0">
+                <div className="flex items-center justify-between px-3 py-2 border-b">
+                  <span className="text-sm font-medium">Notifications</span>
+                  <button
+                    className="text-xs text-primary hover:underline"
+                    onClick={async ()=>{await notificationsService.markAllRead(); await loadList();}}
+                  >
+                    Mark all read
+                  </button>
+                </div>
+                <div className="max-h-96 overflow-auto">
+                  {notifs.length === 0 && (
+                    <div className="p-4 text-sm text-muted-foreground">No notifications</div>
+                  )}
+                  {notifs.map((n)=>(
+                    <div
+                      key={n.id}
+                      className={`px-3 py-2 border-b last:border-b-0 ${n.is_read ? "" : "bg-secondary/40"} cursor-pointer hover:bg-secondary`}
+                      onClick={()=>handleOpenNotification(n)}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex items-center justify-center">
+                          {n.sender_avatar ? <img src={n.sender_avatar} alt="" className="w-full h-full object-cover" /> : <span className="text-xs">{(n.sender_name || "U").charAt(0)}</span>}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium">{n.title}</span>
+                            {!n.is_read && <span className="w-2 h-2 rounded-full bg-accent" />}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{n.message}</div>
+                          <div className="mt-2">
+                            {!n.is_read && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={async (e)=>{e.stopPropagation(); await notificationsService.markRead(n.id); await loadList();}}
+                              >
+                                Mark read
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* User Menu */}
             <DropdownMenu>

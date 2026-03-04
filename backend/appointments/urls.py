@@ -7,6 +7,8 @@ from .views import (
     RescheduleRequestView,
     DoctorAvailabilityView,
     DoctorAppointmentsView,
+    DoctorSetVideoLinkView,
+    DoctorWeeklyStatsView,
     DoctorUpdateAppointmentStatusView,
     DoctorRescheduleDecisionView,
     DoctorRescheduleView,
@@ -20,7 +22,6 @@ from .views import (
     PharmacyPrescriptionsView,
     PharmacyUpdatePrescriptionStatusView,
     PharmacyUpdatePrescriptionBillView,
-    PatientPrescriptionBillView,
     DoctorCreateLabRequestView,
     LabRequestsView,
     LabUpdateRequestStatusView,
@@ -34,6 +35,11 @@ from .views import (
     LabHistoryExportCSVView,
     LabRecordPDFView,
     LabHistoryBackfillView,
+    StripeCreateCheckoutView,
+    StripeSuccessView,
+    StripeConfigView,
+    StripeCreatePaymentIntentView,
+    StripeVerifyPaymentIntentView,
 )
 
 
@@ -48,11 +54,18 @@ urlpatterns = [
     # Doctor
     path("availability/", DoctorAvailabilityView.as_view(), name="doctor_availability"),
     path("doctor/", DoctorAppointmentsView.as_view(), name="doctor_appointments"),
+    path("doctor/<int:pk>/video-link/", DoctorSetVideoLinkView.as_view(), name="doctor_set_video_link"),
+    path("doctor/weekly-stats/", DoctorWeeklyStatsView.as_view(), name="doctor_weekly_stats"),
     path("doctor/patients/", DoctorPatientsListView.as_view(), name="doctor_patients"),
     path("doctor/patients/<int:patient_id>/history/", DoctorPatientHistoryView.as_view(), name="doctor_patient_history"),
     path("<int:pk>/status/", DoctorUpdateAppointmentStatusView.as_view(), name="doctor_update_status"),
     path("doctor/<int:pk>/reschedule-decision/", DoctorRescheduleDecisionView.as_view(), name="doctor_reschedule_decision"),
     path("doctor/<int:pk>/reschedule/", DoctorRescheduleView.as_view(), name="doctor_reschedule"),
+    path("<int:pk>/pay/", StripeCreateCheckoutView.as_view(), name="appointment_pay"),
+    path("stripe/success/", StripeSuccessView.as_view(), name="stripe_success"),
+    path("stripe/config/", StripeConfigView.as_view(), name="stripe_config"),
+    path("<int:pk>/payment-intent/", StripeCreatePaymentIntentView.as_view(), name="stripe_payment_intent"),
+    path("stripe/verify-intent/", StripeVerifyPaymentIntentView.as_view(), name="stripe_verify_intent"),
 
     # Admin
     path("admin/all/", AdminAllAppointmentsView.as_view(), name="admin_all_appointments"),
@@ -63,7 +76,6 @@ urlpatterns = [
     path("pharmacy/prescriptions/", PharmacyPrescriptionsView.as_view(), name="pharmacy_prescriptions"),
     path("pharmacy/prescriptions/<int:pk>/status/", PharmacyUpdatePrescriptionStatusView.as_view(), name="pharmacy_update_prescription_status"),
     path("pharmacy/prescriptions/<int:pk>/bill/", PharmacyUpdatePrescriptionBillView.as_view(), name="pharmacy_update_prescription_bill"),
-    path("patient/prescriptions/<int:pk>/bill/", PatientPrescriptionBillView.as_view(), name="patient_prescription_bill"),
     path("<int:pk>/lab-request/", DoctorCreateLabRequestView.as_view(), name="doctor_create_lab_request"),
     path("lab/requests/", LabRequestsView.as_view(), name="lab_requests"),
     path("lab/requests/<int:pk>/status/", LabUpdateRequestStatusView.as_view(), name="lab_update_request_status"),

@@ -54,6 +54,7 @@ const DoctorProfile = () => {
           hospital: data.hospital_name || "",
           dob: data.date_of_birth || "",
           avatar: data.avatar || null,
+          idCode: data.profile_code || "",
         });
       } catch (e) {
         // ignore
@@ -150,7 +151,7 @@ const DoctorProfile = () => {
           </div>
           <div className="text-center sm:text-left space-y-2 flex-1">
             <h2 className="text-2xl font-bold">{formData.name}</h2>
-            <p className="text-muted-foreground">{formData.specialty} | ID: #DR-2024-001</p>
+            <p className="text-muted-foreground">{formData.specialty} | ID: {formData.idCode}</p>
             <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
               <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">Verified Specialist</span>
               <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">Top Rated</span>

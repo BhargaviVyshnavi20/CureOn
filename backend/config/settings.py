@@ -11,6 +11,12 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+try:
+    from dotenv import load_dotenv  # python-dotenv
+    _ENV_LOADED = load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
+except Exception:
+    _ENV_LOADED = False
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,6 +52,7 @@ INSTALLED_APPS = [
     "appointments",
     "equipment",
     "pharmacy",
+    "payments",
 ]
 
 MIDDLEWARE = [

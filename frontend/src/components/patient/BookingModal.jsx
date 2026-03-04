@@ -22,6 +22,7 @@ import { enUS, hi, te } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { appointmentsService, userService } from "@/services/api";
+import { toast } from "sonner";
 
 const specializations = [
   { id: "general", name: "General Physician", icon: Stethoscope, description: "For general health checkups" },
@@ -31,6 +32,10 @@ const specializations = [
   { id: "eye", name: "Ophthalmologist", icon: Eye, description: "Eye care specialist" },
   { id: "pedia", name: "Pediatrician", icon: Baby, description: "Child health specialist" },
   { id: "derma", name: "Dermatologist", icon: Smile, description: "Skin care specialist" },
+  { id: "psych", name: "Psychiatrist", icon: Brain, description: "Mental health specialist" },
+  { id: "ent", name: "ENT Specialist", icon: Stethoscope, description: "Ear, nose and throat" },
+  { id: "gyn", name: "Gynecologist", icon: Stethoscope, description: "Women's health specialist" },
+  { id: "uro", name: "Urologist", icon: Stethoscope, description: "Urinary tract specialist" },
 ];
 
 const BookingModal = ({ open, onOpenChange, onBookingConfirmed }) => {
@@ -91,32 +96,41 @@ const BookingModal = ({ open, onOpenChange, onBookingConfirmed }) => {
     loadSlots();
   }, [formData.doctorId, formData.date]);
 
-  const handleSubmit = () => {
-    if (formData.date && formData.time && formData.doctorId) {
+  const [submitting, setSubmitting] = useState(false);
+  const handleSubmit = async () => {
+    if (!(formData.date && formData.time && formData.doctorId)) return;
+    setSubmitting(true);
+    try {
       const payload = {
         doctor_id: formData.doctorId,
         date: format(formData.date, "yyyy-MM-dd"),
         time_slot: formData.time,
         visit_type: formData.visitType,
       };
-      appointmentsService.book(payload)
-        .then((data) => {
-          onBookingConfirmed && onBookingConfirmed(data);
-        })
-        .catch(() => {
-          // ignore, UI toasts can be added
-        });
+      const data = await appointmentsService.book(payload);
+      onBookingConfirmed && onBookingConfirmed(data);
+      setStep(1);
+      setFormData({
+        specialization: "",
+        doctorId: null,
+        date: undefined,
+        time: "",
+        visitType: "VIDEO_CALL",
+      });
+      onOpenChange(false);
+    } catch (e) {
+      let msg = "Failed to book appointment";
+      const d = e?.response?.data;
+      if (typeof d === "string") msg = d;
+      else if (d?.detail) msg = d.detail;
+      else if (d && typeof d === "object") {
+        const firstKey = Object.keys(d)[0];
+        if (firstKey && Array.isArray(d[firstKey]) && d[firstKey][0]) msg = d[firstKey][0];
+      }
+      toast.error(msg);
+    } finally {
+      setSubmitting(false);
     }
-    // Reset form and close modal
-    setStep(1);
-    setFormData({
-      specialization: "",
-      doctorId: null,
-      date: undefined,
-      time: "",
-      visitType: "VIDEO_CALL",
-    });
-    onOpenChange(false);
   };
 
   const handleBack = () => {
@@ -169,8 +183,12 @@ const BookingModal = ({ open, onOpenChange, onBookingConfirmed }) => {
                       <spec.icon className="w-7 h-7 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-foreground">{t(`appointments.specialties.${spec.id}`)}</h3>
-                      <p className="text-sm text-muted-foreground">{t(`appointments.specialties.${spec.id}Desc`)}</p>
+                      <h3 className="font-semibold text-foreground">
+                        {t(`appointments.specialties.${spec.id}`) === `appointments.specialties.${spec.id}` ? spec.name : t(`appointments.specialties.${spec.id}`)}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {t(`appointments.specialties.${spec.id}Desc`) === `appointments.specialties.${spec.id}Desc` ? spec.description : t(`appointments.specialties.${spec.id}Desc`)}
+                      </p>
                     </div>
                   </div>
                 </button>
@@ -183,7 +201,9 @@ const BookingModal = ({ open, onOpenChange, onBookingConfirmed }) => {
             {selectedSpec && (
               <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
                 <selectedSpec.icon className="w-5 h-5 text-primary" />
-                <span className="font-medium text-foreground">{t(`appointments.specialties.${selectedSpec.id}`)}</span>
+                <span className="font-medium text-foreground">
+                  {t(`appointments.specialties.${selectedSpec.id}`) === `appointments.specialties.${selectedSpec.id}` ? selectedSpec.name : t(`appointments.specialties.${selectedSpec.id}`)}
+                </span>
                 <Button variant="ghost" size="sm" className="ml-auto" onClick={handleBack}>
                       {i18nText('common.change', 'Change')}
                 </Button>
@@ -302,9 +322,9 @@ const BookingModal = ({ open, onOpenChange, onBookingConfirmed }) => {
                 variant="hero"
                 onClick={handleSubmit}
                 className="flex-1"
-                disabled={!formData.date || !formData.time || !formData.doctorId}
+                disabled={submitting || !formData.date || !formData.time || !formData.doctorId}
               >
-                {i18nText('common.confirm', 'Confirm')}
+                {submitting ? i18nText('common.loading', 'Loading...') : i18nText('common.confirm', 'Confirm')}
               </Button>
             </div>
           </div>

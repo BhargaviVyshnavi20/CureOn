@@ -229,7 +229,7 @@ const PharmacyHistory = () => {
                   <TableHead>Details</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>User</TableHead>
+                  <TableHead>Patient</TableHead>
                   <TableHead className="text-right">Action</TableHead>
                 </TableRow>
               </TableHeader>
