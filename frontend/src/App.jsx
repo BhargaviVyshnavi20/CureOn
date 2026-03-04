@@ -22,6 +22,7 @@ import DoctorPatients from "./pages/doctor/DoctorPatients";
 import DoctorAvailability from "./pages/doctor/DoctorAvailability";
 import DoctorSettings from "./pages/doctor/DoctorSettings";
 import DoctorProfile from "./pages/doctor/DoctorProfile";
+import DoctorRescheduleRequests from "./pages/doctor/DoctorRescheduleRequests";
 import DoctorPatientDetails from "./pages/doctor/DoctorPatientDetails";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminDoctors from "./pages/admin/AdminDoctors";
@@ -31,6 +32,7 @@ import AdminLabs from "./pages/admin/AdminLabs";
 import AdminDoctorDetails from "./pages/admin/AdminDoctorDetails";
 import AdminPatientDetails from "./pages/admin/AdminPatientDetails";
 import AdminAppointments from "./pages/admin/AdminAppointments";
+import AdminPayments from "./pages/admin/AdminPayments";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminProfile from "./pages/admin/AdminProfile";
 import PharmacyDashboard from "./pages/pharmacy/PharmacyDashboard";
@@ -83,6 +85,7 @@ const App = () => (
               <Routes>
                 <Route path="dashboard" element={<DoctorDashboard />} />
                 <Route path="appointments" element={<DoctorAppointments />} />
+                <Route path="reschedule-requests" element={<DoctorRescheduleRequests />} />
                 <Route path="patients" element={<DoctorPatients />} />
                 <Route path="patients/:id" element={<DoctorPatientDetails />} />
                 <Route path="availability" element={<DoctorAvailability />} />
@@ -103,6 +106,7 @@ const App = () => (
                 <Route path="doctors/:id" element={<AdminDoctorDetails />} />
                 <Route path="patients/:id" element={<AdminPatientDetails />} />
                 <Route path="appointments" element={<AdminAppointments />} />
+                <Route path="payments" element={<AdminPayments />} />
                 <Route path="settings" element={<AdminSettings />} />
                 <Route path="profile" element={<AdminProfile />} />
               </Routes>

@@ -277,13 +277,13 @@ const PrescriptionModal = ({ open, onOpenChange, appointment, onSubmit }) => {
                     onChange={(e) => handleMedicineChange(index, "duration", e.target.value)}
                   />
                 </div>
-                <div className="col-span-1 space-y-1">
+                <div className="col-span-2 space-y-1">
                   <Label className="text-xs">Qty</Label>
                   <Input 
                     type="number"
-                    min={1}
+                    min={0}
                     value={medicine.quantity}
-                    onChange={(e) => handleMedicineChange(index, "quantity", Math.max(1, parseInt(e.target.value || "1")))}
+                    onChange={(e) => handleMedicineChange(index, "quantity", Math.max(0, parseInt(e.target.value || "0")))}
                   />
                 </div>
                 <div className="col-span-1">

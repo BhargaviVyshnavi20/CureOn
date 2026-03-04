@@ -275,6 +275,10 @@ export const appointmentsService = {
     });
     return response.data;
   },
+  doctorSetVideoLink: async (appointmentId, video_url) => {
+    const response = await appointmentsApi.post(`/doctor/${appointmentId}/video-link/`, { video_url });
+    return response.data;
+  },
 
   doctorUpdateStatus: async (appointmentId, status) => {
     const response = await appointmentsApi.post(`/${appointmentId}/status/`, {
@@ -298,9 +302,33 @@ export const appointmentsService = {
     );
     return response.data;
   },
+  createVideoPayment: async (appointmentId) => {
+    const response = await appointmentsApi.post(`/${appointmentId}/pay/`);
+    return response.data;
+  },
+  verifyStripeSuccess: async (session_id) => {
+    const response = await appointmentsApi.get(`/stripe/success/`, { params: { session_id } });
+    return response.data;
+  },
+  stripeConfig: async () => {
+    const response = await appointmentsApi.get(`/stripe/config/`);
+    return response.data;
+  },
+  createPaymentIntent: async (appointmentId) => {
+    const response = await appointmentsApi.post(`/${appointmentId}/payment-intent/`);
+    return response.data;
+  },
+  verifyPaymentIntent: async (payment_intent_id) => {
+    const response = await appointmentsApi.post(`/stripe/verify-intent/`, { payment_intent_id });
+    return response.data;
+  },
 
   doctorPatients: async () => {
     const response = await appointmentsApi.get("/doctor/patients/");
+    return response.data;
+  },
+  doctorWeeklyStats: async () => {
+    const response = await appointmentsApi.get("/doctor/weekly-stats/");
     return response.data;
   },
 
@@ -375,12 +403,6 @@ export const appointmentsService = {
         `/pharmacy/prescriptions/${prescriptionId}/bill/`,
         { items }
       );
-      return response.data;
-    },
-    downloadBill: async (prescriptionId) => {
-      const response = await appointmentsApi.get(`/patient/prescriptions/${prescriptionId}/bill/`, {
-        responseType: "blob",
-      });
       return response.data;
     },
   },
@@ -787,6 +809,10 @@ export const pharmacyService = {
       });
       return response.data;
     },
+    createManual: async (payload) => {
+      const response = await pharmacyApi.post("/orders/manual/", payload);
+      return response.data;
+    },
     backfill: async () => {
       const response = await pharmacyApi.post("/orders/backfill-from-prescriptions/");
       return response.data;
@@ -811,8 +837,8 @@ export const pharmacyService = {
       const response = await pharmacyApi.post(`/orders/${id}/complete/`);
       return response.data;
     },
-    bill: async (id) => {
-      const response = await pharmacyApi.get(`/orders/${id}/bill/`, {
+    receipt: async (id) => {
+      const response = await pharmacyApi.get(`/orders/${id}/receipt/`, {
         responseType: "blob",
       });
       return response.data;
@@ -899,6 +925,30 @@ export const profileService = {
       const response = await api.patch("/admin/profile/", payload);
       return response.data;
     },
+  },
+};
+
+export const notificationsService = {
+  list: async ({ unread = false, limit } = {}) => {
+    const response = await api.get("/notifications/", {
+      params: {
+        unread: unread ? 1 : undefined,
+        limit: limit || undefined,
+      },
+    });
+    return response.data;
+  },
+  unreadCount: async () => {
+    const response = await api.get("/notifications/unread-count/");
+    return response.data.unread || 0;
+  },
+  markRead: async (id) => {
+    const response = await api.post(`/notifications/${id}/read/`);
+    return response.data;
+  },
+  markAllRead: async () => {
+    const response = await api.post("/notifications/mark-all-read/");
+    return response.data;
   },
 };
 

@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from decimal import Decimal
 from io import BytesIO
+from io import StringIO
 from django.db.models import Q, F, Sum
 from django.http import HttpResponse
 from rest_framework import viewsets, status
@@ -12,7 +13,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from appointments.models import Prescription
 from accounts.permissions import IsDoctor, IsPatient, IsAdmin
-from .models import InventoryItem, Transaction, PharmacyOrder
+from .models import InventoryItem, Transaction, PharmacyOrder, PharmacyOrderItem
 from .serializers import (
     InventoryItemSerializer,
     InventoryStatsSerializer,
@@ -21,7 +22,9 @@ from .serializers import (
     PharmacyOrderSerializer,
 )
 from .services import create_order_from_prescription, complete_order_and_create_sale, recalc_order_totals
-from django.core.files.base import ContentFile
+from accounts.models import PatientProfile
+import uuid
+import re
 from .permissions import CanManageInventory
 
 
@@ -115,10 +118,17 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = super().get_queryset()
+        user = self.request.user
         q = self.request.query_params.get("q") or self.request.query_params.get("search")
         types = self.request.query_params.get("types")
         date_from = self.request.query_params.get("date_from")
         date_to = self.request.query_params.get("date_to")
+        # Limit to current pharmacy's transactions
+        try:
+            if getattr(user, "role", "").upper() == "PHARMACY":
+                qs = qs.filter(user=user)
+        except Exception:
+            pass
         if q:
             s = q.strip()
             qs = qs.filter(
@@ -149,11 +159,23 @@ class TransactionViewSet(viewsets.ModelViewSet):
     def export_csv(self, request):
         qs = self.get_queryset()
         import csv
+        import re
 
-        buffer = BytesIO()
+        buffer = StringIO()
         writer = csv.writer(buffer)
-        writer.writerow(["Transaction ID", "Date", "Time", "Type", "Details", "Amount", "Status", "User"])
+        writer.writerow(["Transaction ID", "Date", "Time", "Type", "Details", "Amount", "Status", "Patient"])
         for t in qs:
+            patient_name = None
+            try:
+                m = re.search(r"Order\s+(ORD-\d+)", t.details or "")
+                if m:
+                    code = m.group(1)
+                    o = PharmacyOrder.objects.select_related("patient").filter(code=code).first()
+                    if o and o.patient:
+                        full = f"{getattr(o.patient, 'first_name', '')} {getattr(o.patient, 'last_name', '')}".strip()
+                        patient_name = full or o.patient.username
+            except Exception:
+                patient_name = None
             writer.writerow(
                 [
                     t.trx_code,
@@ -163,7 +185,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
                     t.details,
                     f"{t.amount}",
                     t.get_status_display(),
-                    (t.user.username if t.user else "System"),
+                    patient_name or (t.user.username if t.user else "System"),
                 ]
             )
         response = HttpResponse(buffer.getvalue(), content_type="text/csv")
@@ -222,6 +244,10 @@ class CatalogViewSet(viewsets.ReadOnlyModelViewSet):
                 "Orthopedic": ["Orthopedic", "Bones"],
                 "Ophthalmologist": ["Eye", "Ophthalmology"],
                 "Pediatrician": ["Pediatric", "Children"],
+                "Psychiatrist": ["Psychiatry", "CNS", "Neuro"],
+                "ENT Specialist": ["ENT", "Otolaryngology", "Ear", "Nose", "Throat"],
+                "Gynecologist": ["Gynecology", "Women", "OBGYN"],
+                "Urologist": ["Urology", "Renal", "Urinary"],
                 "General Physician": ["General", "Antibiotics", "Painkiller", "Vitamins"],
             }
             cats = []
@@ -247,6 +273,78 @@ class PharmacyOrderViewSet(viewsets.ModelViewSet):
     queryset = PharmacyOrder.objects.select_related("pharmacy", "patient").prefetch_related("items")
     serializer_class = PharmacyOrderSerializer
     permission_classes = [IsAuthenticated]
+
+    @action(detail=False, methods=["post"], url_path="manual")
+    def manual(self, request):
+        try:
+            # Create an order without a prescription, using current pharmacy inventory
+            user = request.user
+            if getattr(user, "role", "").upper() not in ("PHARMACY", "ADMIN"):
+                return Response({"detail": "Forbidden"}, status=403)
+            # Accept either patient_id or free-text patient_name
+            patient = None
+            patient_id = request.data.get("patient_id")
+            patient_name = (request.data.get("patient_name") or "").strip()
+            if patient_id is not None:
+                try:
+                    patient = get_object_or_404(get_user_model(), pk=int(patient_id))
+                except Exception:
+                    return Response({"detail": "Invalid patient_id"}, status=400)
+            else:
+                if not patient_name:
+                    return Response({"detail": "patient_name is required when patient_id is not provided"}, status=400)
+                # Create a lightweight patient user for this order
+                User = get_user_model()
+                # Try to split first/last name
+                parts = [p for p in re.split(r"\s+", patient_name) if p]
+                first_name = parts[0] if parts else patient_name
+                last_name = " ".join(parts[1:]) if len(parts) > 1 else ""
+                # Generate a unique username
+                base = re.sub(r"[^a-zA-Z0-9]+", "-", patient_name).strip("-").lower() or "guest"
+                username = f"{base}-{uuid.uuid4().hex[:8]}"
+                patient = User.objects.create_user(
+                    username=username,
+                    password=uuid.uuid4().hex,
+                    first_name=first_name[:30],
+                    last_name=last_name[:150],
+                    role=getattr(User, "Role").PATIENT,
+                )
+                try:
+                    PatientProfile.objects.get_or_create(user=patient)
+                except Exception:
+                    pass
+            items = request.data.get("items") or []
+            if not isinstance(items, list) or not items:
+                return Response({"detail": "items is required"}, status=400)
+            order = PharmacyOrder.objects.create(
+                prescription_id=0,
+                patient=patient,
+                pharmacy=user,  # bind to current user account for visibility
+                created_by=user,
+                total_amount=0,
+            )
+            total = Decimal("0.00")
+            for it in items:
+                inv_id = (it or {}).get("inventory_id")
+                qty = int((it or {}).get("quantity") or 0)
+                if qty <= 0 or not inv_id:
+                    continue
+                inv = InventoryItem.objects.filter(id=inv_id).first()
+                if not inv:
+                    continue
+                poi = PharmacyOrderItem.objects.create(
+                    order=order,
+                    item=inv,
+                    name=inv.name,
+                    quantity=qty,
+                    unit_price=inv.price or Decimal("0.00"),
+                )
+                total += poi.amount or Decimal("0.00")
+            order.total_amount = total
+            order.save(update_fields=["total_amount"])
+            return Response(PharmacyOrderSerializer(order).data, status=201)
+        except Exception as e:
+            return Response({"detail": f"Order create failed: {str(e)}"}, status=400)
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -349,51 +447,6 @@ class PharmacyOrderViewSet(viewsets.ModelViewSet):
             pass
         return Response(PharmacyOrderSerializer(order).data)
 
-    @action(detail=True, methods=["get"], url_path="bill")
-    def bill(self, request, pk=None):
-        order = self.get_object()
-        try:
-            order = recalc_order_totals(order)
-        except Exception:
-            pass
-        # Generate a simple PDF bill using PIL
-        img = Image.new("RGB", (700, 800), color="white")
-        draw = ImageDraw.Draw(img)
-        y = 30
-        draw.text((260, y), "Medication Order Bill", fill="black"); y += 30
-        draw.line((20, y, 680, y), fill="black"); y += 10
-        draw.text((40, y), f"Order: {order.order_id or order.id}", fill="black"); y += 25
-        draw.text((40, y), f"Date: {order.created_at.strftime('%Y-%m-%d %H:%M')}", fill="black"); y += 25
-        draw.text((40, y), f"Patient: {getattr(order.patient, 'username', '')}", fill="black"); y += 25
-        draw.text((40, y), f"Pharmacy: {getattr(order.pharmacy, 'username', '')}", fill="black"); y += 25
-        draw.line((20, y, 680, y), fill="black"); y += 15
-        draw.text((40, y), "Items:", fill="black"); y += 20
-        total = Decimal("0.00")
-        for it in order.items.all():
-            line = f"- {it.name}  x{it.quantity}  @ {it.unit_price} = {it.amount}"
-            draw.text((50, y), line, fill="black"); y += 20
-            total += (it.amount or Decimal("0.00"))
-            if y > 700:
-                draw.line((20, y, 680, y), fill="black"); y = 60
-        draw.line((20, y, 680, y), fill="black"); y += 25
-        draw.text((40, y), f"Total Amount: {total}", fill="black"); y += 25
-        draw.text((40, y), "Thank you!", fill="black")
-        pdf_io = BytesIO()
-        img.save(pdf_io, "PDF", resolution=100.0)
-        pdf_io.seek(0)
-        # Attach to prescription for patient retrieval
-        try:
-            presc = Prescription.objects.get(id=order.prescription_id)
-            presc.total_amount = total
-            content = ContentFile(pdf_io.getvalue())
-            filename = f"bill_{order.order_id or order.id}.pdf"
-            presc.bill_attachment.save(filename, content, save=True)
-        except Exception:
-            pass
-        response = HttpResponse(pdf_io.getvalue(), content_type="application/pdf")
-        response["Content-Disposition"] = f'attachment; filename="bill_{order.order_id or order.id}.pdf"'
-        return response
-
     @action(detail=False, methods=["post"], url_path="backfill-from-prescriptions")
     def backfill_from_prescriptions(self, request):
         # Create missing orders for this pharmacy from active prescriptions where
@@ -451,3 +504,48 @@ class PharmacyOrderViewSet(viewsets.ModelViewSet):
                 continue
         qs = self.get_queryset().filter(pharmacy=request.user)
         return Response({"updated": count, "orders": PharmacyOrderSerializer(qs, many=True).data})
+
+    @action(detail=True, methods=["get"], url_path="receipt")
+    def receipt(self, request, pk=None):
+        order = self.get_object()
+        img = Image.new("RGB", (700, 800), color="white")
+        draw = ImageDraw.Draw(img)
+        y = 30
+        draw.text((260, y), "Medication Bill", fill="black"); y += 30
+        draw.line((20, y, 680, y), fill="black"); y += 10
+        draw.text((40, y), f"Order: {getattr(order, 'code', order.id)}", fill="black"); y += 25
+        draw.text((40, y), f"Date: {order.created_at.strftime('%Y-%m-%d %H:%M')}", fill="black"); y += 25
+        draw.text((40, y), f"Patient: {(order.patient.username if order.patient else 'Unknown')}", fill="black"); y += 25
+        draw.text((40, y), f"Pharmacy: {(order.pharmacy.username if order.pharmacy else 'Unknown')}", fill="black"); y += 25
+        draw.line((20, y, 680, y), fill="black"); y += 10
+        draw.text((40, y), "Items:", fill="black"); y += 25
+        draw.text((40, y), "Name", fill="black")
+        draw.text((360, y), "Qty", fill="black")
+        draw.text((460, y), "Unit Price", fill="black")
+        draw.text((590, y), "Line Total", fill="black"); y += 20
+        draw.line((20, y, 680, y), fill="black"); y += 10
+        total = Decimal("0.00")
+        for it in order.items.all():
+            name = it.name or (it.item.name if it.item else "")
+            qty = int(it.quantity or 0)
+            unit = Decimal(str(it.unit_price or it.item.price if getattr(it, "item", None) else 0))
+            line_total = unit * qty
+            total += line_total
+            draw.text((40, y), str(name)[:34], fill="black")
+            draw.text((360, y), f"{qty}", fill="black")
+            draw.text((460, y), f"{unit}", fill="black")
+            draw.text((590, y), f"{line_total}", fill="black")
+            y += 22
+            if y > 720:
+                break
+        draw.line((20, y, 680, y), fill="black"); y += 10
+        draw.text((480, y), "Total:", fill="black")
+        draw.text((590, y), f"{total}", fill="black"); y += 30
+        draw.text((40, y), "Thank you for your purchase!", fill="black")
+        pdf = BytesIO()
+        img.save(pdf, "PDF", resolution=100.0)
+        pdf.seek(0)
+        response = HttpResponse(pdf.getvalue(), content_type="application/pdf")
+        fn = f"bill_{getattr(order, 'code', order.id)}.pdf"
+        response["Content-Disposition"] = f'attachment; filename="{fn}"'
+        return response

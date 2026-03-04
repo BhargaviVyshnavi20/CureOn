@@ -14,6 +14,10 @@ const AppointmentCard = ({
   showActions = true,
   customActions,
   userType = "patient",
+  isPaid,
+  paymentStatus,
+  onPay,
+  onPayAgain,
   onJoin,
   onReschedule,
   onCancel,
@@ -33,6 +37,20 @@ const AppointmentCard = ({
   const name = userType === "patient" ? doctorName : patientName;
 
   const isCompleted = status === "completed";
+  const normalizedPaymentStatus = String(paymentStatus || "").toUpperCase();
+  const showPaymentRejected =
+    type === "video" && userType === "patient" && normalizedPaymentStatus === "REJECTED";
+  const showPayNow =
+    type === "video" &&
+    userType === "patient" &&
+    isPaid === false &&
+    normalizedPaymentStatus !== "REJECTED";
+  const showPayAgain = showPaymentRejected && !!onPayAgain;
+  const showApprovedDisabledPayNow =
+    type === "video" &&
+    userType === "patient" &&
+    normalizedPaymentStatus === "APPROVED" &&
+    !!onPay;
 
   return (
     <div className={`dashboard-card p-5 ${isCompleted ? "bg-muted/30" : "hover-lift"}`}>
@@ -82,11 +100,33 @@ const AppointmentCard = ({
               </span>
             </div>
           </div>
+          {showPaymentRejected && (
+            <div className="mt-3">
+              <span className="inline-flex items-center rounded-full bg-destructive/10 px-2.5 py-1 text-xs font-medium text-destructive">
+                Payment Rejected
+              </span>
+            </div>
+          )}
 
           {showActions && status === "upcoming" && (
             <div className="flex items-center gap-2 mt-4">
+              {showPayNow && onPay && (
+                <Button size="sm" variant="hero" onClick={onPay}>
+                  {i18nText('common.payNow', 'Pay Now')}
+                </Button>
+              )}
+              {showPayAgain && (
+                <Button size="sm" variant="hero" onClick={onPayAgain}>
+                  Pay Again
+                </Button>
+              )}
+              {showApprovedDisabledPayNow && (
+                <Button size="sm" variant="hero" onClick={onPay} disabled>
+                  {i18nText('common.payNow', 'Pay Now')}
+                </Button>
+              )}
               {type === "video" && (
-                <Button size="sm" variant="default" onClick={onJoin}>
+                <Button size="sm" variant="default" onClick={onJoin} disabled={userType === "patient" && isPaid === false}>
                   {i18nText('common.joinCall', 'Join Call')}
                 </Button>
               )}

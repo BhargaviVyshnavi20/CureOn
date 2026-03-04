@@ -18,8 +18,9 @@ from accounts.permissions import IsPatient, IsDoctor, IsAdmin, IsPharmacy, IsLab
 from django.http import StreamingHttpResponse, FileResponse, HttpResponse
 import csv
 from io import StringIO, BytesIO
+import os
 from datetime import datetime
-from django.core.files.base import ContentFile
+from accounts.models import Notification
 
 User = get_user_model()
 
@@ -103,6 +104,17 @@ class BookAppointmentView(APIView):
         appt = Appointment.objects.create(
             patient=request.user, doctor=doctor, date=date_obj, time_slot=time_obj, visit_type=visit_type
         )
+        try:
+            Notification.objects.create(
+                recipient=doctor,
+                sender=request.user,
+                type=Notification.Type.APPOINTMENT_BOOKED,
+                title="New appointment booked",
+                message=f"{request.user.username} booked {date} {time_slot}",
+                data={"appointment_id": appt.id},
+            )
+        except Exception:
+            pass
         return Response(AppointmentSerializer(appt).data, status=201)
 
 
@@ -125,6 +137,17 @@ class CancelAppointmentView(APIView):
         appt = get_object_or_404(Appointment, pk=pk, patient=request.user)
         appt.status = Appointment.Status.CANCELLED
         appt.save(update_fields=["status", "updated_at"])
+        try:
+            Notification.objects.create(
+                recipient=appt.doctor,
+                sender=request.user,
+                type=Notification.Type.APPOINTMENT_STATUS,
+                title="Appointment cancelled",
+                message=f"{request.user.username} cancelled the appointment",
+                data={"appointment_id": appt.id, "status": appt.status},
+            )
+        except Exception:
+            pass
         return Response(AppointmentSerializer(appt).data)
 
 
@@ -158,6 +181,17 @@ class RescheduleRequestView(APIView):
         appt.requested_date = date_obj
         appt.requested_time_slot = time_obj
         appt.save(update_fields=["status", "requested_date", "requested_time_slot", "updated_at"])
+        try:
+            Notification.objects.create(
+                recipient=appt.doctor,
+                sender=request.user,
+                type=Notification.Type.RESCHEDULE_REQUEST,
+                title="Reschedule requested",
+                message=f"Requested {requested_date} {requested_time_slot}",
+                data={"appointment_id": appt.id, "requested_date": requested_date, "requested_time_slot": requested_time_slot},
+            )
+        except Exception:
+            pass
         return Response(AppointmentSerializer(appt).data)
 
 
@@ -206,6 +240,33 @@ class DoctorAppointmentsView(APIView):
         data = AppointmentSerializer(qs.order_by("-date", "time_slot"), many=True).data
         return Response(data)
 
+class DoctorSetVideoLinkView(APIView):
+    permission_classes = [IsDoctor]
+    def post(self, request, pk):
+        video_url = (request.data.get("video_url") or "").strip()
+        if not video_url:
+            return Response({"detail": "video_url is required"}, status=400)
+        if not (video_url.startswith("https://meet.google.com/") or video_url.startswith("http://meet.google.com/")):
+            return Response({"detail": "Provide a valid Google Meet link"}, status=400)
+        appt = get_object_or_404(Appointment, pk=pk, doctor=request.user)
+        appt.video_url = video_url
+        appt.save(update_fields=["video_url", "updated_at"])
+        return Response(AppointmentSerializer(appt).data)
+
+class DoctorWeeklyStatsView(APIView):
+    permission_classes = [IsDoctor]
+    def get(self, request):
+        today = timezone.localdate()
+        start = today - timedelta(days=today.weekday())
+        days = []
+        for i in range(7):
+            d = start + timedelta(days=i)
+            qs = Appointment.objects.filter(doctor=request.user, date=d)
+            received = qs.count()
+            completed = qs.filter(status=Appointment.Status.COMPLETED).count()
+            label = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"][i]
+            days.append({"day": label, "date": d.isoformat(), "received": received, "completed": completed})
+        return Response({"week_start": start.isoformat(), "days": days})
 class DoctorPatientsListView(APIView):
     permission_classes = [IsDoctor]
     def get(self, request):
@@ -295,6 +356,17 @@ class DoctorUpdateAppointmentStatusView(APIView):
             return Response({"detail": "Invalid status"}, status=400)
         appt.status = new_status
         appt.save(update_fields=["status", "updated_at"])
+        try:
+            Notification.objects.create(
+                recipient=appt.patient,
+                sender=request.user,
+                type=Notification.Type.APPOINTMENT_STATUS,
+                title="Appointment status updated",
+                message=f"Status changed to {new_status}",
+                data={"appointment_id": appt.id, "status": new_status},
+            )
+        except Exception:
+            pass
         return Response(AppointmentSerializer(appt).data)
 
 class DoctorRescheduleDecisionView(APIView):
@@ -320,6 +392,17 @@ class DoctorRescheduleDecisionView(APIView):
         appt.requested_date = None
         appt.requested_time_slot = None
         appt.save(update_fields=["date", "time_slot", "status", "requested_date", "requested_time_slot", "updated_at"])
+        try:
+            Notification.objects.create(
+                recipient=appt.patient,
+                sender=request.user,
+                type=Notification.Type.APPOINTMENT_STATUS,
+                title="Reschedule decision made",
+                message=f"Decision: {decision}",
+                data={"appointment_id": appt.id, "decision": decision},
+            )
+        except Exception:
+            pass
         return Response(AppointmentSerializer(appt).data)
 
 class DoctorRescheduleView(APIView):
@@ -353,6 +436,17 @@ class DoctorRescheduleView(APIView):
         appt.requested_date = None
         appt.requested_time_slot = None
         appt.save(update_fields=["date", "time_slot", "status", "requested_date", "requested_time_slot", "updated_at"])
+        try:
+            Notification.objects.create(
+                recipient=appt.patient,
+                sender=request.user,
+                type=Notification.Type.APPOINTMENT_STATUS,
+                title="Appointment rescheduled",
+                message=f"New time {new_date} {new_time_slot}",
+                data={"appointment_id": appt.id, "date": new_date, "time_slot": new_time_slot},
+            )
+        except Exception:
+            pass
         return Response(AppointmentSerializer(appt).data)
 
 
@@ -399,6 +493,137 @@ class AdminCancelAppointmentView(APIView):
         appt.save(update_fields=["status", "updated_at"])
         return Response(AppointmentSerializer(appt).data)
 
+class StripeCreateCheckoutView(APIView):
+    permission_classes = [IsPatient]
+    def post(self, request, pk):
+        appt = get_object_or_404(Appointment, pk=pk, patient=request.user)
+        if appt.visit_type != Appointment.VisitType.VIDEO_CALL:
+            return Response({"detail": "Payment required only for video call"}, status=400)
+        if appt.is_paid:
+            return Response({"detail": "Already paid"}, status=200)
+        try:
+            import stripe
+        except Exception as e:
+            return Response({"detail": f"Stripe import failed: {e.__class__.__name__}: {e}"}, status=400)
+        secret = os.environ.get("STRIPE_SECRET_KEY")
+        if not secret:
+            return Response({"detail": "Stripe secret not configured"}, status=400)
+        stripe.api_key = secret
+        origin = request.headers.get("Origin") or request.META.get("HTTP_ORIGIN") or "http://localhost:5173"
+        success = f"{origin}/patient/appointments?payment=success&session_id={{CHECKOUT_SESSION_ID}}"
+        cancel = f"{origin}/patient/appointments?payment=cancel"
+        try:
+            session = stripe.checkout.Session.create(
+                mode="payment",
+                payment_method_types=["card"],
+                line_items=[{
+                    "price_data": {
+                        "currency": "usd",
+                        "product_data": {"name": "Video Consultation"},
+                        "unit_amount": int(os.environ.get("APPOINTMENT_PRICE_CENTS", "2000")),
+                    },
+                    "quantity": 1,
+                }],
+                success_url=success,
+                cancel_url=cancel,
+                metadata={"appointment_id": str(appt.id), "patient_id": str(request.user.id)},
+            )
+            return Response({"url": session.get("url")})
+        except Exception as e:
+            return Response({"detail": str(e)}, status=400)
+
+class StripeSuccessView(APIView):
+    permission_classes = [IsPatient]
+    def get(self, request):
+        session_id = request.query_params.get("session_id")
+        if not session_id:
+            return Response({"detail": "session_id required"}, status=400)
+        try:
+            import stripe
+        except Exception as e:
+            return Response({"detail": f"Stripe import failed: {e.__class__.__name__}: {e}"}, status=400)
+        secret = os.environ.get("STRIPE_SECRET_KEY")
+        if not secret:
+            return Response({"detail": "Stripe secret not configured"}, status=400)
+        stripe.api_key = secret
+        try:
+            session = stripe.checkout.Session.retrieve(session_id)
+            if session.get("payment_status") != "paid":
+                return Response({"detail": "Payment not completed"}, status=400)
+            meta = session.get("metadata") or {}
+            appt_id = meta.get("appointment_id")
+            if not appt_id:
+                return Response({"detail": "Missing appointment"}, status=400)
+            appt = get_object_or_404(Appointment, pk=appt_id, patient=request.user)
+            if not appt.is_paid:
+                appt.is_paid = True
+                appt.save(update_fields=["is_paid", "updated_at"])
+            return Response(AppointmentSerializer(appt).data)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=400)
+
+class StripeConfigView(APIView):
+    permission_classes = [IsPatient]
+    def get(self, request):
+        pk = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")
+        return Response({"public_key": pk})
+
+class StripeCreatePaymentIntentView(APIView):
+    permission_classes = [IsPatient]
+    def post(self, request, pk):
+        appt = get_object_or_404(Appointment, pk=pk, patient=request.user)
+        if appt.visit_type != Appointment.VisitType.VIDEO_CALL:
+            return Response({"detail": "Payment required only for video call"}, status=400)
+        if appt.is_paid:
+            return Response({"detail": "Already paid"}, status=200)
+        try:
+            import stripe
+        except Exception as e:
+            return Response({"detail": f"Stripe import failed: {e.__class__.__name__}: {e}"}, status=400)
+        secret = os.environ.get("STRIPE_SECRET_KEY")
+        if not secret:
+            return Response({"detail": "Stripe secret not configured"}, status=400)
+        stripe.api_key = secret
+        try:
+            intent = stripe.PaymentIntent.create(
+                amount=int(os.environ.get("APPOINTMENT_PRICE_CENTS", "2000")),
+                currency="usd",
+                metadata={"appointment_id": str(appt.id), "patient_id": str(request.user.id)},
+                automatic_payment_methods={"enabled": True},
+            )
+            return Response({"client_secret": intent.get("client_secret"), "payment_intent_id": intent.get("id")})
+        except Exception as e:
+            return Response({"detail": str(e)}, status=400)
+
+class StripeVerifyPaymentIntentView(APIView):
+    permission_classes = [IsPatient]
+    def post(self, request):
+        pi = request.data.get("payment_intent_id")
+        if not pi:
+            return Response({"detail": "payment_intent_id required"}, status=400)
+        try:
+            import stripe
+        except Exception as e:
+            return Response({"detail": f"Stripe import failed: {e.__class__.__name__}: {e}"}, status=400)
+        secret = os.environ.get("STRIPE_SECRET_KEY")
+        if not secret:
+            return Response({"detail": "Stripe secret not configured"}, status=400)
+        stripe.api_key = secret
+        try:
+            intent = stripe.PaymentIntent.retrieve(pi)
+            status = intent.get("status")
+            if status not in ("succeeded", "processing"):
+                # return status so client can display clear message
+                return Response({"status": status, "detail": f"Payment not completed: {status}"}, status=202)
+            appt_id = (intent.get("metadata") or {}).get("appointment_id")
+            appt = get_object_or_404(Appointment, pk=appt_id, patient=request.user)
+            if status == "succeeded" and not appt.is_paid:
+                appt.is_paid = True
+                appt.save(update_fields=["is_paid", "updated_at"])
+            return Response({"status": status, "appointment": AppointmentSerializer(appt).data})
+        except Exception as e:
+            return Response({"detail": str(e)}, status=400)
+
 class DoctorCreatePrescriptionView(APIView):
     permission_classes = [IsDoctor]
 
@@ -420,6 +645,10 @@ class DoctorCreatePrescriptionView(APIView):
                 "Orthopedic": ["Orthopedic", "Bones"],
                 "Ophthalmologist": ["Eye", "Ophthalmology"],
                 "Pediatrician": ["Pediatric", "Children"],
+                "Psychiatrist": ["Psychiatry", "CNS", "Neuro"],
+                "ENT Specialist": ["ENT", "Otolaryngology", "Ear", "Nose", "Throat"],
+                "Gynecologist": ["Gynecology", "Women", "OBGYN"],
+                "Urologist": ["Urology", "Renal", "Urinary"],
                 "General Physician": ["General", "Antibiotics", "Painkiller", "Vitamins"],
             }
             cats = []
@@ -461,6 +690,35 @@ class DoctorCreatePrescriptionView(APIView):
                     continue
         except Exception:
             pass
+        try:
+            Notification.objects.create(
+                recipient=appt.patient,
+                sender=request.user,
+                type=Notification.Type.PRESCRIPTION_CREATED,
+                title="Prescription created",
+                message=f"Prescription for appointment #{appt.id}",
+                data={"appointment_id": appt.id, "prescription_id": presc.id},
+            )
+        except Exception:
+            pass
+        try:
+            owners = []
+            if hasattr(presc, "pharmacy") and presc.pharmacy:
+                owners.append(presc.pharmacy)
+        except Exception:
+            owners = []
+        try:
+            for pharm in owners:
+                Notification.objects.create(
+                    recipient=pharm,
+                    sender=request.user,
+                    type=Notification.Type.PHARMACY_STATUS,
+                    title="New prescription assigned",
+                    message=f"Prescription #{presc.id} assigned",
+                    data={"prescription_id": presc.id},
+                )
+        except Exception:
+            pass
         return Response(PrescriptionSerializer(presc).data, status=201)
 
 class PatientPrescriptionsView(APIView):
@@ -469,50 +727,6 @@ class PatientPrescriptionsView(APIView):
     def get(self, request):
         qs = Prescription.objects.filter(patient=request.user).order_by("-created_at")
         return Response(PrescriptionSerializer(qs, many=True).data)
-
-class PatientPrescriptionBillView(APIView):
-    permission_classes = [IsPatient]
-    def get(self, request, pk):
-        presc = get_object_or_404(Prescription, pk=pk, patient=request.user)
-        if presc.bill_attachment:
-            try:
-                return FileResponse(presc.bill_attachment.open("rb"), as_attachment=True, filename=f"bill_RX-{presc.id}.pdf")
-            except Exception:
-                pass
-        # Fallback: generate minimal bill from prescription items
-        img = Image.new("RGB", (700, 800), color="white")
-        draw = ImageDraw.Draw(img)
-        y = 30
-        draw.text((270, y), "Prescription Bill", fill="black"); y += 30
-        draw.line((20, y, 680, y), fill="black"); y += 10
-        draw.text((40, y), f"RX: {presc.id}", fill="black"); y += 25
-        draw.text((40, y), f"Date: {presc.created_at.strftime('%Y-%m-%d %H:%M')}", fill="black"); y += 25
-        draw.text((40, y), f"Doctor: {getattr(presc.doctor, 'username', '')}", fill="black"); y += 25
-        draw.text((40, y), f"Patient: {getattr(presc.patient, 'username', '')}", fill="black"); y += 25
-        draw.line((20, y, 680, y), fill="black"); y += 15
-        draw.text((40, y), "Items:", fill="black"); y += 20
-        total = 0.0
-        for it in presc.items.all():
-            amt = float((it.unit_price or 0) * (it.quantity or 0))
-            line = f"- {it.name}  x{it.quantity or 0}  @ {it.unit_price or 0} = {amt:.2f}"
-            draw.text((50, y), line, fill="black"); y += 20
-            total += amt
-            if y > 700:
-                draw.line((20, y, 680, y), fill="black"); y = 60
-        draw.line((20, y, 680, y), fill="black"); y += 25
-        draw.text((40, y), f"Total Amount: {total:.2f}", fill="black"); y += 25
-        draw.text((40, y), "Thank you!", fill="black")
-        pdf_io = BytesIO()
-        img.save(pdf_io, "PDF", resolution=100.0)
-        pdf_io.seek(0)
-        try:
-            content = ContentFile(pdf_io.getvalue())
-            presc.bill_attachment.save(f"bill_RX-{presc.id}.pdf", content, save=True)
-            presc.total_amount = total
-            presc.save(update_fields=["bill_attachment", "total_amount", "updated_at"])
-        except Exception:
-            pass
-        return FileResponse(BytesIO(pdf_io.getvalue()), as_attachment=True, filename=f"bill_RX-{presc.id}.pdf")
 
 class PharmacyPrescriptionsView(APIView):
     permission_classes = [IsPharmacy]
@@ -534,6 +748,17 @@ class PharmacyUpdatePrescriptionStatusView(APIView):
         if new_status == Prescription.PharmacyStatus.COMPLETED:
             presc.status = Prescription.Status.COMPLETED
         presc.save(update_fields=["pharmacy_status", "status", "updated_at"])
+        try:
+            Notification.objects.create(
+                recipient=presc.patient,
+                sender=request.user,
+                type=Notification.Type.PHARMACY_STATUS,
+                title="Prescription status updated",
+                message=f"Status changed to {new_status}",
+                data={"prescription_id": presc.id, "status": new_status},
+            )
+        except Exception:
+            pass
         # Hook: create SALE transactions when order is completed
         if (
             new_status == Prescription.PharmacyStatus.COMPLETED
@@ -594,32 +819,20 @@ class PharmacyUpdatePrescriptionBillView(APIView):
         if not isinstance(items, list) or not items:
             return Response({"detail": "items list required"}, status=400)
         total = 0
-        matched_any = False
         for incoming in items:
             item_id = incoming.get("id")
-            name = incoming.get("name")
             unit_price = incoming.get("unit_price")
             quantity = incoming.get("quantity")
-            if unit_price is None or quantity is None:
-                return Response({"detail": "unit_price and quantity required per item"}, status=400)
-            obj = None
-            if item_id is not None:
-                try:
-                    obj = presc.items.get(id=item_id)
-                except Exception:
-                    obj = None
-            if obj is None and name:
-                obj = presc.items.filter(name__iexact=name).first()
-            if obj is not None:
-                matched_any = True
-                obj.unit_price = unit_price
-                obj.quantity = quantity
-                obj.save(update_fields=["unit_price", "quantity"])
-            # Even if item not found on prescription, include in computed total
+            if item_id is None or unit_price is None or quantity is None:
+                return Response({"detail": "id, unit_price, quantity required per item"}, status=400)
             try:
-                total += float(unit_price) * int(quantity)
+                obj = presc.items.get(id=item_id)
             except Exception:
-                pass
+                return Response({"detail": f"Item {item_id} not found"}, status=404)
+            obj.unit_price = unit_price
+            obj.quantity = quantity
+            obj.save(update_fields=["unit_price", "quantity"])
+            total += float(unit_price) * int(quantity)
         presc.total_amount = total
         file = request.FILES.get("attachment")
         update_fields = ["total_amount", "updated_at"]
@@ -652,6 +865,25 @@ class DoctorCreateLabRequestView(APIView):
         serializer = LabTestRequestSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         obj = serializer.save(patient=appt.patient, doctor=request.user, lab=lab_user)
+        try:
+            Notification.objects.create(
+                recipient=lab_user,
+                sender=request.user,
+                type=Notification.Type.LAB_REQUEST_CREATED,
+                title="New lab request",
+                message=", ".join(data.get("tests", [])),
+                data={"lab_request_id": obj.id},
+            )
+            Notification.objects.create(
+                recipient=appt.patient,
+                sender=request.user,
+                type=Notification.Type.LAB_REQUEST_CREATED,
+                title="Lab tests ordered",
+                message=", ".join(data.get("tests", [])),
+                data={"lab_request_id": obj.id},
+            )
+        except Exception:
+            pass
         return Response(LabTestRequestSerializer(obj).data, status=201)
 
 class LabRequestsView(APIView):
@@ -680,6 +912,25 @@ class LabUpdateRequestStatusView(APIView):
             return Response({"detail": "Invalid status"}, status=400)
         req.status = new_status
         req.save(update_fields=["status", "updated_at"])
+        try:
+            Notification.objects.create(
+                recipient=req.patient,
+                sender=request.user,
+                type=Notification.Type.LAB_STATUS,
+                title="Lab request status updated",
+                message=f"Status changed to {new_status}",
+                data={"lab_request_id": req.id, "status": new_status},
+            )
+            Notification.objects.create(
+                recipient=req.doctor,
+                sender=request.user,
+                type=Notification.Type.LAB_STATUS,
+                title="Lab request status updated",
+                message=f"Status changed to {new_status}",
+                data={"lab_request_id": req.id, "status": new_status},
+            )
+        except Exception:
+            pass
         return Response(LabTestRequestSerializer(req).data)
 
 class LabSubmitResultView(APIView):
@@ -715,6 +966,25 @@ class LabSubmitResultView(APIView):
                     result_details=req.clinical_notes or "",
                     attachment=req.attachment,
                 )
+        except Exception:
+            pass
+        try:
+            Notification.objects.create(
+                recipient=req.patient,
+                sender=request.user,
+                type=Notification.Type.LAB_RESULT_READY,
+                title="Lab result ready",
+                message=", ".join(req.tests) if isinstance(req.tests, list) else str(req.tests),
+                data={"lab_request_id": req.id},
+            )
+            Notification.objects.create(
+                recipient=req.doctor,
+                sender=request.user,
+                type=Notification.Type.LAB_RESULT_READY,
+                title="Lab result ready",
+                message=", ".join(req.tests) if isinstance(req.tests, list) else str(req.tests),
+                data={"lab_request_id": req.id},
+            )
         except Exception:
             pass
         return Response(LabTestRequestSerializer(req).data)
@@ -761,6 +1031,17 @@ class DoctorUploadLabResultView(APIView):
                 )
         except Exception:
             pass
+        try:
+            Notification.objects.create(
+                recipient=req.patient,
+                sender=request.user,
+                type=Notification.Type.LAB_RESULT_READY,
+                title="Report uploaded",
+                message=", ".join(req.tests) if isinstance(req.tests, list) else str(req.tests),
+                data={"lab_request_id": req.id},
+            )
+        except Exception:
+            pass
         return Response(LabTestRequestSerializer(req).data)
 
 class DoctorUploadAdhocReportView(APIView):
@@ -803,6 +1084,17 @@ class DoctorUploadAdhocReportView(APIView):
             clinical_notes=(notes + f"\n[REPORT_NAME:{report_name}]\n[UPLOADED_BY_DOCTOR]").strip(),
             attachment=file,
         )
+        try:
+            Notification.objects.create(
+                recipient=patient,
+                sender=request.user,
+                type=Notification.Type.LAB_RESULT_READY,
+                title="Report uploaded",
+                message=report_name,
+                data={"lab_request_id": obj.id},
+            )
+        except Exception:
+            pass
         return Response(LabTestRequestSerializer(obj).data, status=201)
 
 class PatientUploadsView(APIView):

@@ -85,15 +85,16 @@ const RescheduleModal = ({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="font-display text-xl flex items-center gap-2">
-            <CalendarDays className="w-5 h-5 text-primary" />
-            {t('common.reschedule')}
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto" style={{ direction: "rtl" }}>
+        <div style={{ direction: "ltr" }}>
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl flex items-center gap-2">
+              <CalendarDays className="w-5 h-5 text-primary" />
+              {t('common.reschedule')}
+            </DialogTitle>
+          </DialogHeader>
 
-        <div className="py-4 space-y-6">
+          <div className="py-4 space-y-6">
           {appointmentDetails && (
             <div className="p-3 rounded-lg bg-secondary/50 border border-border">
               <p className="text-sm text-muted-foreground">{t('appointments.currentAppointment')}:</p>
@@ -173,6 +174,7 @@ const RescheduleModal = ({
             >
               {t('common.confirm')}
             </Button>
+          </div>
           </div>
         </div>
       </DialogContent>

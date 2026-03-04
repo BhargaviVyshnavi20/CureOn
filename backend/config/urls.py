@@ -27,6 +27,7 @@ urlpatterns = [
     path("api/appointments/", include("appointments.urls")),
     path("api/equipment/", include("equipment.urls")),
     path("api/pharmacy/", include("pharmacy.urls")),
+    path("api/payments/", include("payments.urls")),
     path("api/send-credentials", SendCredentialsView.as_view()),
 ]
 if settings.DEBUG:

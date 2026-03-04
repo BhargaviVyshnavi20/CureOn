@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
-from .views import RegisterView, AdminCreateStaffView, UserDetailView, UsersListView, AdminUserUpdateView, DoctorsPublicListView, LabsPublicListView, PharmaciesPublicListView, PatientProfileView, DoctorProfileView, PharmacyProfileView, LabProfileView, AdminProfileView, ChangePasswordView, ChangeUsernameView, AvatarUploadView, MyTokenObtainPairView
+from .views import RegisterView, AdminCreateStaffView, UserDetailView, UsersListView, AdminUserUpdateView, DoctorsPublicListView, LabsPublicListView, PharmaciesPublicListView, PatientProfileView, DoctorProfileView, PharmacyProfileView, LabProfileView, AdminProfileView, ChangePasswordView, ChangeUsernameView, AvatarUploadView, MyTokenObtainPairView, NotificationsListView, NotificationsUnreadCountView, NotificationsMarkReadView, NotificationsMarkAllReadView
 from .views_admin import (
     AdminDoctorDetailView,
     AdminPatientDetailView,
@@ -27,6 +27,10 @@ urlpatterns = [
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),
     path('change-username/', ChangeUsernameView.as_view(), name='change_username'),
     path('profile/avatar/', AvatarUploadView.as_view(), name='profile_avatar'),
+    path('notifications/', NotificationsListView.as_view(), name='notifications_list'),
+    path('notifications/unread-count/', NotificationsUnreadCountView.as_view(), name='notifications_unread_count'),
+    path('notifications/<int:pk>/read/', NotificationsMarkReadView.as_view(), name='notifications_mark_read'),
+    path('notifications/mark-all-read/', NotificationsMarkAllReadView.as_view(), name='notifications_mark_all_read'),
     
     # Admin Detail Views
     path('admin/doctors/<int:id>/', AdminDoctorDetailView.as_view(), name='admin_doctor_detail'),

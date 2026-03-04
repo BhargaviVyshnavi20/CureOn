@@ -60,6 +60,7 @@ const DoctorAppointments = () => {
         time: a.time_slot,
         type: mapType(a.visit_type),
         status: mapStatus(a.status),
+        video_url: a.video_url || null,
         rescheduleRequested: a.status === "RESCHEDULE_REQUESTED",
         requestedDate: a.requested_date ? format(new Date(a.requested_date), "PP") : null,
         requestedTime: a.requested_time_slot || null,
@@ -78,10 +79,34 @@ const DoctorAppointments = () => {
     loadAppointments();
   }, []);
 
-  const handleJoinCall = (appointment) => {
-    toast.success(`Starting video call with ${appointment.patientName}`);
-    // Simulate opening a video call window
-    window.open(`https://meet.google.com/new`, '_blank');
+  const handleJoinCall = async (appointment) => {
+    try {
+      if (appointment.video_url) {
+        window.open(appointment.video_url, "_blank");
+        return;
+      }
+      const meetTab = window.open("https://meet.google.com/new", "_blank");
+      let pasted = "";
+      try {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          const clip = await navigator.clipboard.readText();
+          if (clip && /https?:\/\/meet\.google\.com\/[A-Za-z0-9-]+/i.test(clip)) {
+            pasted = clip.trim();
+          }
+        }
+      } catch {}
+      if (!pasted) {
+        pasted = window.prompt("Paste the Google Meet link here so the patient can join the same call:") || "";
+      }
+      if (!pasted) return;
+      const { appointmentsService } = await import("@/services/api");
+      const updated = await appointmentsService.doctorSetVideoLink(appointment.id, pasted);
+      setAppointments((prev) => prev.map(a => a.id === appointment.id ? { ...a, video_url: updated.video_url } : a));
+      window.open(updated.video_url, "_blank");
+      toast.success("Meeting link saved and opened");
+    } catch {
+      toast.error("Failed to start or save meeting link");
+    }
   };
 
   const handleCancel = (appointment) => {
@@ -173,13 +198,23 @@ const DoctorAppointments = () => {
     >
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">
-            Appointments
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            View and manage your appointments
-          </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">
+              Appointments
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              View and manage your appointments
+            </p>
+          </div>
+          <div>
+            <a
+              href="/doctor/reschedule-requests"
+              className="inline-flex items-center px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition"
+            >
+              Review Reschedule Requests
+            </a>
+          </div>
         </div>
 
         {/* Tabs */}
