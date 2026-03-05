@@ -48,6 +48,8 @@ class Appointment(models.Model):
     time_slot = models.TimeField()
     status = models.CharField(max_length=32, choices=Status.choices, default=Status.UPCOMING)
     visit_type = models.CharField(max_length=20, choices=VisitType.choices, default=VisitType.VIDEO_CALL)
+    video_url = models.URLField(max_length=500, null=True, blank=True)
+    is_paid = models.BooleanField(default=False)
 
     requested_date = models.DateField(null=True, blank=True)
     requested_time_slot = models.TimeField(null=True, blank=True)

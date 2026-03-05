@@ -64,7 +64,6 @@ const PharmacyInventory = () => {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [lowStockOnly, setLowStockOnly] = useState(false);
   const [expiredOnly, setExpiredOnly] = useState(false);
-  const [supplierFilter, setSupplierFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [isAddItemOpen, setIsAddItemOpen] = useState(false);
   const [isEditItemOpen, setIsEditItemOpen] = useState(false);
@@ -81,7 +80,7 @@ const PharmacyInventory = () => {
     minStock: "",
     price: "",
     expiry: "",
-    supplier: ""
+    
   });
   const categories = [
     "Cardiac",
@@ -94,6 +93,19 @@ const PharmacyInventory = () => {
     "Antibiotics",
     "Painkiller",
     "Vitamins",
+    "Psychiatry",
+    "CNS",
+    "ENT",
+    "Otolaryngology",
+    "Ear",
+    "Nose",
+    "Throat",
+    "Gynecology",
+    "Women",
+    "OBGYN",
+    "Urology",
+    "Renal",
+    "Urinary",
   ];
 
   const [inventory, setInventory] = useState([]);
@@ -115,7 +127,7 @@ const PharmacyInventory = () => {
           pharmacyService.inventory.list({
             search: searchTerm,
             category: categoryFilter,
-            supplier: supplierFilter,
+            
             low_stock: lowStockOnly,
             expired: expiredOnly,
           }),
@@ -130,7 +142,7 @@ const PharmacyInventory = () => {
       }
     };
     load();
-  }, [searchTerm, categoryFilter, supplierFilter, lowStockOnly, expiredOnly]);
+  }, [searchTerm, categoryFilter, lowStockOnly, expiredOnly]);
 
   const handleAddItem = async () => {
     try {
@@ -141,12 +153,12 @@ const PharmacyInventory = () => {
         min_stock: parseInt(newItem.minStock || 0),
         price: parseFloat(newItem.price || 0),
         expiry: newItem.expiry || null,
-        supplier: newItem.supplier,
+        
       };
       await pharmacyService.inventory.create(payload);
       toast.success("New item added to inventory");
       setIsAddItemOpen(false);
-      setNewItem({ name: "", category: "", stock: "", minStock: "", price: "", expiry: "", supplier: "" });
+      setNewItem({ name: "", category: "", stock: "", minStock: "", price: "", expiry: "" });
       const items = await pharmacyService.inventory.list();
       const s = await pharmacyService.inventory.stats();
       setInventory(items || []);
@@ -188,7 +200,7 @@ const PharmacyInventory = () => {
         min_stock: parseInt(selectedItem.min_stock ?? selectedItem.minStock ?? 0),
         price: parseFloat(selectedItem.price || 0),
         expiry: selectedItem.expiry || null,
-        supplier: selectedItem.supplier,
+        
       };
       const updated = await pharmacyService.inventory.update(selectedItem.id, payload);
       setInventory(inventory.map(item => item.id === updated.id ? updated : item));
@@ -310,15 +322,7 @@ const PharmacyInventory = () => {
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="supplier">Supplier</Label>
-                  <Input
-                    id="supplier"
-                    value={newItem.supplier}
-                    onChange={(e) => setNewItem({...newItem, supplier: e.target.value})}
-                    placeholder="Supplier Name"
-                  />
-                </div>
+                
               </div>
               <DialogFooter>
                 <Button type="submit" onClick={handleAddItem}>Add Item</Button>
@@ -396,14 +400,7 @@ const PharmacyInventory = () => {
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-supplier">Supplier</Label>
-                    <Input
-                      id="edit-supplier"
-                      value={selectedItem.supplier}
-                      onChange={(e) => setSelectedItem({...selectedItem, supplier: e.target.value})}
-                    />
-                  </div>
+                  
                 </div>
               )}
               <DialogFooter>
@@ -511,10 +508,7 @@ const PharmacyInventory = () => {
                 <Label>Category</Label>
                 <Input value={categoryFilter} onChange={(e)=>setCategoryFilter(e.target.value)} placeholder="e.g. Antibiotics" />
               </div>
-              <div className="space-y-1">
-                <Label>Supplier</Label>
-                <Input value={supplierFilter} onChange={(e)=>setSupplierFilter(e.target.value)} placeholder="Supplier" />
-              </div>
+              
               <label className="flex items-center gap-2 mt-6">
                 <input type="checkbox" checked={lowStockOnly} onChange={(e)=>setLowStockOnly(e.target.checked)} />
                 <span className="text-sm">Low Stock</span>
@@ -535,7 +529,7 @@ const PharmacyInventory = () => {
                   <TableHead>Stock Level</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Expiry Date</TableHead>
-                  <TableHead>Supplier</TableHead>
+                  
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -565,7 +559,7 @@ const PharmacyInventory = () => {
                     </TableCell>
                     <TableCell>{formatINR.format(Number(item.price || 0))}</TableCell>
                     <TableCell>{item.expiry}</TableCell>
-                    <TableCell>{item.supplier}</TableCell>
+                    
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

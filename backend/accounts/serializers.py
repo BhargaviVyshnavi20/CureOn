@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import PatientProfile, DoctorProfile, PharmacyProfile, LabProfile
+from .models import PatientProfile, DoctorProfile, PharmacyProfile, LabProfile, Notification
 from django.db import transaction
 
 User = get_user_model()
@@ -13,6 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ExtendedUserSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField()
     specialization = serializers.SerializerMethodField()
+    profile_code = serializers.SerializerMethodField()
     phone = serializers.SerializerMethodField()
     license_number = serializers.SerializerMethodField()
     address = serializers.SerializerMethodField()
@@ -35,7 +36,7 @@ class ExtendedUserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'role', 'is_active', 'date_joined', 'first_name', 'last_name',
                   'specialization', 'phone', 'license_number', 'address', 'age', 'gender', 'date_of_birth',
                   'blood_type', 'height_cm', 'weight_kg', 'allergies', 'chronic_diseases', 'past_diseases',
-                  'family_history', 'hospital_name', 'experience_years', 'about', 'avatar']
+                  'family_history', 'hospital_name', 'experience_years', 'about', 'avatar', 'profile_code']
 
     def get_specialization(self, obj):
         p = getattr(obj, 'doctor_profile', None)
@@ -44,6 +45,23 @@ class ExtendedUserSerializer(serializers.ModelSerializer):
         f = getattr(obj, 'avatar', None)
         try:
             return f.url if f else None
+        except Exception:
+            return None
+
+    def get_profile_code(self, obj):
+        try:
+            year = getattr(obj, "date_joined", None).year if getattr(obj, "date_joined", None) else None
+            if not year:
+                year = 0
+            if obj.role == User.Role.DOCTOR:
+                qs = User.objects.filter(role=User.Role.DOCTOR, date_joined__year=year)
+                serial = qs.filter(id__lte=obj.id).count()
+                return f"#DR-{year}-{serial:03d}"
+            if obj.role == User.Role.PATIENT:
+                qs = User.objects.filter(role=User.Role.PATIENT, date_joined__year=year)
+                serial = qs.filter(id__lte=obj.id).count()
+                return f"PT-{year}-{serial:03d}"
+            return None
         except Exception:
             return None
 
@@ -328,3 +346,23 @@ class LabProfileUpdateSerializer(serializers.Serializer):
                 setattr(profile, f, validated_data[f])
         profile.save()
         return instance
+
+class NotificationSerializer(serializers.ModelSerializer):
+    sender_name = serializers.SerializerMethodField()
+    sender_avatar = serializers.SerializerMethodField()
+    class Meta:
+        model = Notification
+        fields = ["id", "type", "title", "message", "data", "is_read", "created_at", "sender_name", "sender_avatar"]
+    def get_sender_name(self, obj):
+        u = getattr(obj, "sender", None)
+        if not u:
+            return None
+        full = f"{getattr(u, 'first_name', '')} {getattr(u, 'last_name', '')}".strip()
+        return full or u.username
+    def get_sender_avatar(self, obj):
+        u = getattr(obj, "sender", None)
+        f = getattr(u, "avatar", None) if u else None
+        try:
+            return f.url if f else None
+        except Exception:
+            return None

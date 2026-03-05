@@ -4,6 +4,7 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import AppointmentCard from "@/components/dashboard/AppointmentCard";
 import BookingModal from "@/components/patient/BookingModal";
 import RescheduleModal from "@/components/patient/RescheduleModal";
+import StripePaymentDialog from "@/components/payments/StripePaymentDialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -25,6 +26,7 @@ const PatientAppointments = () => {
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const [rescheduleModalOpen, setRescheduleModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [paymentOpen, setPaymentOpen] = useState(false);
 
   const navItems = [
     { name: t('common.dashboard'), href: "/patient/dashboard", icon: LayoutDashboard },
@@ -70,6 +72,8 @@ const PatientAppointments = () => {
         status: mapStatus(a.status),
         doctorId: a.doctor,
         avatar: buildAvatarUrl(a.doctor_avatar),
+        video_url: a.video_url || null,
+        isPaid: !!a.is_paid,
       }));
       setAppointments(items);
     } catch {
@@ -81,6 +85,23 @@ const PatientAppointments = () => {
 
   useEffect(() => {
     loadAppointments();
+    try {
+      const url = new URL(window.location.href);
+      const sessionId = url.searchParams.get("session_id");
+      const paid = url.searchParams.get("payment");
+      if (paid === "success" && sessionId) {
+        appointmentsService.verifyStripeSuccess(sessionId).then(()=>{
+          toast.success(t('appointments.paymentSuccess') || "Payment successful");
+          loadAppointments();
+        }).catch(()=>{
+          toast.error(t('appointments.paymentVerifyFailed') || "Payment verification failed");
+        }).finally(()=>{
+          url.searchParams.delete("payment");
+          url.searchParams.delete("session_id");
+          window.history.replaceState({}, "", url.pathname);
+        });
+      }
+    } catch {}
   }, []);
 
   const completedAppointments = appointments.filter(a => a.status === "completed");
@@ -116,7 +137,42 @@ const PatientAppointments = () => {
   };
 
   const handleJoinCall = (appointment) => {
-    toast.success(t('appointments.joinCall', { name: appointment.doctorName }));
+    if (appointment.type === "video" && !appointment.isPaid) {
+      toast.info(t('appointments.payToJoin') || "Please complete payment to join the video call.");
+      return;
+    }
+    if (appointment.video_url) {
+      window.open(appointment.video_url, "_blank");
+      return;
+    }
+    toast.info("Waiting for doctor to start the call. We will auto-join when ready.");
+    let active = true;
+    const startedAt = Date.now();
+    const poll = async () => {
+      if (!active) return;
+      try {
+        const res = await appointmentsService.myAppointments();
+        const found = (res || []).find((a) => a.id === appointment.id);
+        if (found && found.video_url) {
+          window.open(found.video_url, "_blank");
+          toast.success("Joining the video call");
+          loadAppointments();
+          active = false;
+          return;
+        }
+      } catch {}
+      if (Date.now() - startedAt < 60000) {
+        setTimeout(poll, 4000);
+      } else {
+        toast.error("Doctor has not started the call yet. Try again in a moment.");
+        active = false;
+      }
+    };
+    poll();
+  };
+  const handlePay = async (appointment) => {
+    setSelectedAppointment(appointment);
+    setPaymentOpen(true);
   };
 
   const handleCancel = async (appointment) => {
@@ -175,6 +231,8 @@ const PatientAppointments = () => {
                     date={format(appointment.date, "PP", { locale: getDateLocale() })}
                     userType="patient"
                     showActions={true}
+                    isPaid={appointment.isPaid}
+                    onPay={() => handlePay(appointment)}
                     onJoin={() => handleJoinCall(appointment)}
                     onReschedule={() => handleReschedule(appointment)}
                     onCancel={() => handleCancel(appointment)}
@@ -256,6 +314,17 @@ const PatientAppointments = () => {
           currentTime: selectedAppointment.time,
         } : undefined}
         onConfirm={handleRescheduleConfirm}
+      />
+      {/* Payment Dialog */}
+      <StripePaymentDialog
+        open={paymentOpen}
+        onOpenChange={setPaymentOpen}
+        appointmentId={selectedAppointment?.id}
+        onSuccess={() => {
+          setPaymentOpen(false);
+          setSelectedAppointment(null);
+          loadAppointments();
+        }}
       />
     </DashboardLayout>
   );

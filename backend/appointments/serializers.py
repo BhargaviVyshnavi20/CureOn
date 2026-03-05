@@ -29,6 +29,8 @@ class AppointmentSerializer(serializers.ModelSerializer):
             "time_slot",
             "status",
             "visit_type",
+            "video_url",
+            "is_paid",
             "requested_date",
             "requested_time_slot",
             "created_at",

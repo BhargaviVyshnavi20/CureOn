@@ -22,6 +22,7 @@ import DoctorPatients from "./pages/doctor/DoctorPatients";
 import DoctorAvailability from "./pages/doctor/DoctorAvailability";
 import DoctorSettings from "./pages/doctor/DoctorSettings";
 import DoctorProfile from "./pages/doctor/DoctorProfile";
+import DoctorRescheduleRequests from "./pages/doctor/DoctorRescheduleRequests";
 import DoctorPatientDetails from "./pages/doctor/DoctorPatientDetails";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminDoctors from "./pages/admin/AdminDoctors";
@@ -83,6 +84,7 @@ const App = () => (
               <Routes>
                 <Route path="dashboard" element={<DoctorDashboard />} />
                 <Route path="appointments" element={<DoctorAppointments />} />
+                <Route path="reschedule-requests" element={<DoctorRescheduleRequests />} />
                 <Route path="patients" element={<DoctorPatients />} />
                 <Route path="patients/:id" element={<DoctorPatientDetails />} />
                 <Route path="availability" element={<DoctorAvailability />} />

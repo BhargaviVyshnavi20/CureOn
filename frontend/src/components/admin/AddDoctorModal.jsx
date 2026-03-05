@@ -29,6 +29,7 @@ const specializations = [
   "Psychiatrist",
   "ENT Specialist",
   "Gynecologist",
+  "Urologist",
 ];
 
 const AddDoctorModal = ({ open, onOpenChange, onDoctorAdded }) => {

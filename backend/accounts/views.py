@@ -19,8 +19,9 @@ from .serializers import (
     DoctorProfileUpdateSerializer,
     PharmacyProfileUpdateSerializer,
     LabProfileUpdateSerializer,
+    NotificationSerializer,
 )
-from .models import PatientProfile, DoctorProfile, PharmacyProfile, LabProfile
+from .models import PatientProfile, DoctorProfile, PharmacyProfile, LabProfile, Notification
 from .permissions import IsAdmin
 
 User = get_user_model()
@@ -317,3 +318,43 @@ class ChangeUsernameView(APIView):
         request.user.username = new_username
         request.user.save(update_fields=["username"])
         return Response({"detail": "Username updated"}, status=status.HTTP_200_OK)
+
+class NotificationsListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request):
+        unread_only = request.query_params.get("unread") == "1"
+        limit = request.query_params.get("limit")
+        qs = Notification.objects.filter(recipient=request.user)
+        if unread_only:
+            qs = qs.filter(is_read=False)
+        qs = qs.order_by("-created_at")
+        if limit:
+            try:
+                n = int(limit)
+                qs = qs[:n]
+            except Exception:
+                pass
+        return Response(NotificationSerializer(qs, many=True).data)
+
+class NotificationsUnreadCountView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request):
+        c = Notification.objects.filter(recipient=request.user, is_read=False).count()
+        return Response({"unread": c})
+
+class NotificationsMarkReadView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def post(self, request, pk):
+        try:
+            obj = Notification.objects.get(id=pk, recipient=request.user)
+        except Notification.DoesNotExist:
+            return Response({"detail": "Not found"}, status=404)
+        obj.is_read = True
+        obj.save(update_fields=["is_read"])
+        return Response(NotificationSerializer(obj).data)
+
+class NotificationsMarkAllReadView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def post(self, request):
+        Notification.objects.filter(recipient=request.user, is_read=False).update(is_read=True)
+        return Response({"marked": True})

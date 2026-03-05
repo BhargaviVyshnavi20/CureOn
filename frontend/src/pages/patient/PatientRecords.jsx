@@ -39,7 +39,6 @@ const PatientRecords = () => {
 
   const defaultUserRecords = [
     { id: "u1", name: t('records.types.bloodTest'), placeholder: true },
-    { id: "u2", name: t('records.types.xray'), placeholder: true },
     { id: "u3", name: t('records.types.prescription'), placeholder: true },
     { id: "u4", name: t('records.types.vaccination'), placeholder: true },
     { id: "u5", name: t('records.types.insurance'), placeholder: true },
@@ -47,7 +46,6 @@ const PatientRecords = () => {
 
   const [userRecords, setUserRecords] = useState({
     u1: null,
-    u2: null,
     u3: null,
     u4: null,
     u5: null,

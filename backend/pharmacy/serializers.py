@@ -49,6 +49,19 @@ class TransactionSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "transaction_id", "created_at", "user_display", "item_name"]
 
     def get_user_display(self, obj):
+        # Try to show patient name for sales derived from orders
+        try:
+            from .models import PharmacyOrder
+            import re
+            m = re.search(r"Order\s+(ORD-\d+)", obj.details or "")
+            if m:
+                code = m.group(1)
+                o = PharmacyOrder.objects.select_related("patient").filter(code=code).first()
+                if o and o.patient:
+                    full = f"{getattr(o.patient, 'first_name', '')} {getattr(o.patient, 'last_name', '')}".strip()
+                    return full or o.patient.username
+        except Exception:
+            pass
         if obj.user:
             full = f"{obj.user.first_name} {obj.user.last_name}".strip()
             return full or obj.user.username

@@ -14,6 +14,8 @@ const AppointmentCard = ({
   showActions = true,
   customActions,
   userType = "patient",
+  isPaid,
+  onPay,
   onJoin,
   onReschedule,
   onCancel,
@@ -85,8 +87,13 @@ const AppointmentCard = ({
 
           {showActions && status === "upcoming" && (
             <div className="flex items-center gap-2 mt-4">
+              {type === "video" && userType === "patient" && isPaid === false && onPay && (
+                <Button size="sm" variant="hero" onClick={onPay}>
+                  {i18nText('common.payNow', 'Pay Now')}
+                </Button>
+              )}
               {type === "video" && (
-                <Button size="sm" variant="default" onClick={onJoin}>
+                <Button size="sm" variant="default" onClick={onJoin} disabled={userType === "patient" && isPaid === false}>
                   {i18nText('common.joinCall', 'Join Call')}
                 </Button>
               )}

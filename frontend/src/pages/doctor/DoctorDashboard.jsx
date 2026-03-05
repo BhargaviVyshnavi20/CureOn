@@ -31,6 +31,7 @@ const DoctorDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [patients, setPatients] = useState([]);
   const [availability, setAvailability] = useState([]);
+  const [weeklyStats, setWeeklyStats] = useState(null);
 
   const mapType = (t) => (t === "IN_PERSON" ? "in-person" : "video");
   const buildAvatarUrl = (path) => {
@@ -44,18 +45,21 @@ const DoctorDashboard = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const [appts, pats, avail] = await Promise.all([
+        const [appts, pats, avail, wstats] = await Promise.all([
           appointmentsService.doctorAppointments(),
           appointmentsService.doctorPatients(),
           appointmentsService.doctorAvailability.list(),
+          appointmentsService.doctorWeeklyStats(),
         ]);
         setAppointments(appts || []);
         setPatients(pats || []);
         setAvailability(avail || []);
+        setWeeklyStats(wstats || null);
       } catch {
         setAppointments([]);
         setPatients([]);
         setAvailability([]);
+        setWeeklyStats(null);
       }
     };
     load();
@@ -101,22 +105,13 @@ const DoctorDashboard = () => {
   };
 
   const weeklyOverview = useMemo(() => {
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const slotsByDay = new Array(7).fill(0);
-    availability.forEach((rng) => {
-      const count = generateSlotsCount(rng.start_time, rng.end_time);
-      slotsByDay[rng.weekday] += count;
-    });
-    const bookedByDay = new Array(7).fill(0);
-    (appointments || []).forEach((a) => {
-      const d = new Date(a.date);
-      bookedByDay[d.getDay()] += 1;
-    });
-    return days.slice(1, 6).map((label, idx) => {
-      const dayIndex = idx + 1; // Mon-Fri
-      return { day: label, slots: slotsByDay[dayIndex] || 0, booked: bookedByDay[dayIndex] || 0 };
-    });
-  }, [availability, appointments]);
+    if (!weeklyStats || !weeklyStats.days) return [];
+    return weeklyStats.days.map(d => ({
+      day: d.day,
+      received: d.received || 0,
+      completed: d.completed || 0,
+    }));
+  }, [weeklyStats]);
 
   return (
     <DashboardLayout
@@ -204,11 +199,11 @@ const DoctorDashboard = () => {
                     <div className="flex-1 h-3 bg-secondary rounded-full overflow-hidden">
                       <div
                         className="h-full bg-primary rounded-full transition-all"
-                        style={{ width: `${(day.booked / day.slots) * 100}%` }}
+                        style={{ width: `${(day.received ? (day.completed / day.received) * 100 : 0)}%` }}
                       />
                     </div>
                     <span className="text-sm text-muted-foreground">
-                      {day.booked}/{day.slots}
+                      {day.completed}/{day.received}
                     </span>
                   </div>
                 ))}
@@ -218,9 +213,9 @@ const DoctorDashboard = () => {
                   <span className="text-muted-foreground">Weekly capacity</span>
                   <span className="font-medium text-foreground">
                     {(() => {
-                      const totalSlots = weeklyOverview.reduce((s, d) => s + d.slots, 0);
-                      const booked = weeklyOverview.reduce((s, d) => s + d.booked, 0);
-                      const pct = totalSlots ? Math.round((booked / totalSlots) * 100) : 0;
+                      const rec = weeklyOverview.reduce((s, d) => s + d.received, 0);
+                      const comp = weeklyOverview.reduce((s, d) => s + d.completed, 0);
+                      const pct = rec ? Math.round((comp / rec) * 100) : 0;
                       return `${pct}%`;
                     })()}
                   </span>

@@ -58,6 +58,7 @@ const PatientProfile = () => {
           pastDiseases: data.past_diseases || "",
           familyHistory: data.family_history || "",
           avatar: data.avatar || null,
+          patientId: data.profile_code || "",
         });
       } catch (e) {
         // ignore
