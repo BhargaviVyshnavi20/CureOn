@@ -3,6 +3,10 @@
 CureOn is a full-stack healthcare management platform for patients, doctors, labs, pharmacies, and admins.
 It supports appointments, prescriptions, lab workflows, pharmacy operations, and payments in one system.
 
+# My Project
+
+🚀 **Live Demo:** http://cureon.s3-website-us-east-1.amazonaws.com
+
 ## Table of Contents
 
 - [Features](#features)
