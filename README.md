@@ -213,8 +213,6 @@ Role-specific dashboards and permissions are enforced on backend APIs.
   - Ensure backend is running at `http://127.0.0.1:8000`.
 - 401 Unauthorized errors:
   - Re-login to refresh JWT tokens.
-- Stripe payment not working:
-  - Check `STRIPE_SECRET_KEY` and `STRIPE_PUBLISHABLE_KEY` in `backend/.env`.
 - CORS issues:
   - Confirm frontend is running on `http://localhost:5173` or `http://localhost:3000`.
 
